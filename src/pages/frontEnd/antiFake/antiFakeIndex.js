@@ -234,6 +234,7 @@ class Page extends Component {
               let { latitude, longitude } = data;
               let tencentLng = longitude;
               let tencentLat = latitude;
+              console.log(tencentLng,tencentLat)
               window.localStorage.setItem('tencentLng', tencentLng);
               window.localStorage.setItem('tencentLat', tencentLat);
             }
@@ -348,7 +349,7 @@ class Page extends Component {
           var result = JSON.stringify(res)
           window.localStorage.setItem('traceDetail', result);
           this.setState({ traceDetail: res })
-          this.goTraceDetailPage();
+          // this.goTraceDetailPage();
         }
       })
   }
