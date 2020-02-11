@@ -106,7 +106,7 @@ class Page extends Component {
     menberCenterIntegral: null,
     pdfUrl: null,
     activeType: 1,
-    isgoO2o: null,
+    isgoO2o: true,
     o2oList: null,
     isShow: false,
     backgroundImage: null,
@@ -129,11 +129,12 @@ class Page extends Component {
   pageInit = () => {
     // 页面初始化
     let urlParams = parseUrl(this.props.location.search);
-    if (!urlParams || !urlParams.args) {
-      Toast('参数获取失败')
-      return;
-    }
-    let { frnId, uniqueCode, isStartActive, cityId, isgoO2o } = urlParams.args;
+    // if (!urlParams || !urlParams.args) {
+    //   Toast('参数获取失败')
+    //   return;
+    // }
+    // let { frnId, uniqueCode, isStartActive, cityId, isgoO2o } = urlParams.args;
+    let { frnId, uniqueCode, isStartActive, cityId, isgoO2o } =this.state;
     // 获取缓存数据
     let isPhone = window.localStorage.getItem('isPhone');
     let res = window.localStorage.getItem('traceDetail');
@@ -753,7 +754,10 @@ class Page extends Component {
   clickGetDetail = () => {
     this.setState({ isgoO2o: false })
   }
-
+// 点击签到
+clickSingIn = () => {
+  this.props.history.push('/frontEnd/singin');
+}
   render() {
     const { activeType, isgoO2o, o2oList } = this.state;
 
@@ -783,6 +787,7 @@ class Page extends Component {
                       </div>
 
                       <div className='center'>
+                        <div className='singin' onClick={this.clickSingIn}>签到</div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', }}>
 
                           {

@@ -23,8 +23,9 @@ const Lottery = asyncComponent(() => import("../pages/frontEnd/antiFake/lottery"
 const DelerDetail = asyncComponent(() => import("../pages/frontEnd/antiFake/delerDetail"));
 const O2oIndex = asyncComponent(() => import("../pages/frontEnd/o2oIndex/o2oIndex"));
 const Turntable = asyncComponent(() => import("../pages/frontEnd/o2oIndex/turntable"));
-const Test = asyncComponent(() => import("../pages/frontEnd/o2oIndex/test"));
+const SingIn = asyncComponent(() => import("../pages/frontEnd/o2oIndex/singIn"));
 const PrizeInfo = asyncComponent(() => import("../pages/frontEnd/o2oIndex/prizeInfo"));
+const Test = asyncComponent(() => import("../pages/frontEnd/o2oIndex/test"));
 const PcanPage = asyncComponent(() => import("../pages/scanPage/scanPage"));
 
 
@@ -63,6 +64,7 @@ export default class GlobalRouter extends React.Component {
           <Route exact={true} path='/frontEnd/inquireIndex' component={InquireIndex} />
           <Route exact={true} path='/frontEnd/inquireResult' component={InquireResult} />
           <Route exact={true} path='/frontEnd/commomScan' component={CommomScan} />
+          <Route exact={true} path='/frontEnd/singIn' component={SingIn} />
           <Route exact={true} path='/frontEnd/test' component={Test} />
           <Route exact={true} path='/openApi/ADAuth' component={ADAuth} />
           <Route exact={true} path='/openApi/ADAuthLogin' component={ADAuthLogin} />
