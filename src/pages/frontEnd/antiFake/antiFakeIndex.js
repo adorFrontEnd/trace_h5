@@ -349,7 +349,7 @@ class Page extends Component {
           var result = JSON.stringify(res)
           window.localStorage.setItem('traceDetail', result);
           this.setState({ traceDetail: res })
-          // this.goTraceDetailPage();
+          this.goTraceDetailPage();
         }
       })
   }

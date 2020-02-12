@@ -110,8 +110,9 @@ class Page extends Component {
     o2oList: null,
     isShow: false,
     backgroundImage: null,
-    backgroundColor: null
-
+    backgroundColor: null,
+    // 是否开启签到
+    whetherToOpen:null
   }
 
   componentDidMount() {
@@ -151,8 +152,10 @@ class Page extends Component {
     let details = null
     let pdfUrl = null
     let createTime = null
+    let whetherToOpen=null
     if (traceDetail) {
       details = traceDetail.details;
+      whetherToOpen=traceDetail.whetherToOpen
       pdfUrl = traceDetail.details.pdfUrl;
       createTime = dateUtil.getDateTime(traceDetail.details.createTime);
     }
@@ -163,7 +166,7 @@ class Page extends Component {
       this.getUserIp({ token, frnId, uniqueCode, isStartActive, openDrainageSetting, cityId });
     }
     this.setState({
-      frnId, token, uniqueCode,
+      frnId, token, uniqueCode,whetherToOpen,
       isStartActive, isPhone, traceDetail, details, createTime, pdfUrl, openDrainageSetting, cityId, isgoO2o, o2oList
     })
   }
@@ -787,7 +790,10 @@ clickSingIn = () => {
                       </div>
 
                       <div className='center'>
-                        <div className='singin' onClick={this.clickSingIn}>签到</div>
+                        {this.state.whetherToOpen==1?
+                        <div className='singin' onClick={this.clickSingIn}>签到</div>:null
+                        }
+                        
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', }}>
 
                           {

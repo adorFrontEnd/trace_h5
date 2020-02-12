@@ -124,9 +124,9 @@ export default class demo extends Component {
         eventPage({ token })
             .then(data => {
                 if (data.activity == 1) {
-                    let prizes = this.formatList(data.prizes);
-                    let pageInitData = data;
-                    pageInitData.prizes = prizes
+                    // let prizes = this.formatList(data.prizes);
+                    // let pageInitData = data;
+                    // pageInitData.prizes = prizes
 
 
                 } else {

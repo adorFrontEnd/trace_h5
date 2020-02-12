@@ -87,6 +87,19 @@ const prizeCarousel = (params) => {
     tokenless: true
   });
 }
+// 签到
+const signIn = (params) => {
+  return baseHttpProvider.getApi('api/signIn/config', params, {
+    tokenless: true
+  });
+}
+// 确认签到
+const comfirmSinIn = (params) => {
+  return baseHttpProvider.postFormApi('api/signIn/signIn', params, {
+    tokenless: true
+  });
+}
+
 export {
   getArea,
   eventGoodsDetail,
@@ -103,5 +116,7 @@ export {
   prizeInformation,
   submitShippingInformation,
   getShipArea,
-  prizeCarousel
+  prizeCarousel,
+  signIn,
+  comfirmSinIn
 }

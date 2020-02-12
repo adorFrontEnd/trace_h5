@@ -22,10 +22,11 @@ const InquireResult = asyncComponent(() => import("../pages/frontEnd/inquire/inq
 const Lottery = asyncComponent(() => import("../pages/frontEnd/antiFake/lottery"));
 const DelerDetail = asyncComponent(() => import("../pages/frontEnd/antiFake/delerDetail"));
 const O2oIndex = asyncComponent(() => import("../pages/frontEnd/o2oIndex/o2oIndex"));
-const Turntable = asyncComponent(() => import("../pages/frontEnd/o2oIndex/turntable"));
+const Turntable1 = asyncComponent(() => import("../pages/frontEnd/o2oIndex/turntable1"));
 const SingIn = asyncComponent(() => import("../pages/frontEnd/o2oIndex/singIn"));
 const PrizeInfo = asyncComponent(() => import("../pages/frontEnd/o2oIndex/prizeInfo"));
-const Test = asyncComponent(() => import("../pages/frontEnd/o2oIndex/test"));
+// const Test = asyncComponent(() => import("../pages/frontEnd/o2oIndex/test"));
+const Turntable2 = asyncComponent(() => import("../pages/frontEnd/o2oIndex/turntable2"));
 const PcanPage = asyncComponent(() => import("../pages/scanPage/scanPage"));
 
 
@@ -55,7 +56,8 @@ export default class GlobalRouter extends React.Component {
           <Route exact={true} path='/frontEnd/lottery' component={Lottery} />
           <Route exact={true} path='/frontEnd/o2oDetail' component={O2oDetail} />
           <Route exact={true} path='/frontEnd/o2oIndex' component={O2oIndex} />
-          <Route exact={true} path='/frontEnd/turntable' component={Turntable} />
+          <Route exact={true} path='/frontEnd/turntable1' component={Turntable1} />
+          <Route exact={true} path='/frontEnd/turntable2' component={Turntable2} />
           <Route exact={true} path='/frontEnd/prizeInfo' component={PrizeInfo} />
           <Route exact={true} path='/frontEnd/order' component={Order} />
           <Route exact={true} path='/frontEnd/prize' component={Prize} />
@@ -65,7 +67,7 @@ export default class GlobalRouter extends React.Component {
           <Route exact={true} path='/frontEnd/inquireResult' component={InquireResult} />
           <Route exact={true} path='/frontEnd/commomScan' component={CommomScan} />
           <Route exact={true} path='/frontEnd/singIn' component={SingIn} />
-          <Route exact={true} path='/frontEnd/test' component={Test} />
+        
           <Route exact={true} path='/openApi/ADAuth' component={ADAuth} />
           <Route exact={true} path='/openApi/ADAuthLogin' component={ADAuthLogin} />
           <Route exact={true} path='/frontEnd/pcanPage' component={PcanPage} />

@@ -11,7 +11,6 @@ import { prizeCarousel } from '../../../api/frontEnd/o2oIndex';
 const _title = "大转盘";
 const _description = "";
 class Page extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -36,7 +35,8 @@ class Page extends Component {
       token: null,
       status: null,
       prizesList: null,
-      activityId: null
+      activityId: null,
+      o2oList: null
     }
   }
   componentDidMount() {
@@ -53,12 +53,14 @@ class Page extends Component {
     let { activityId } = urlParams.args;
     // 获取缓存初始化页面数据
     let pageInitData = getTurntablePageInitData();
+    let result = window.localStorage.getItem('o2oList');
+    let o2oList = JSON.parse(result).slice(0, 4);
     this.getPrizeCarousel(activityId, token);
     let prizesList = pageInitData.prizes.filter(v => v.id != 'id');
     let awards = pageInitData.prizes
     this.onLoadPage(awards);
     this.setState({
-      pageInitData,
+      pageInitData, o2oList,
       integral: pageInitData.integral,
       awards,
       token,
@@ -263,12 +265,12 @@ class Page extends Component {
         })
         .catch(res => {
           // if (res == 'trace.0024') {
-            this.state.canBeClick = true;
-            lotteryDetail = { integral: 68, message: "很遗憾,未抽中", prizeId: "id", restrict: 84, status: "2" };
-            lotteryDetail.integral = integral;
-            lotteryDetail.restrict = restrict;
-            this.setState({ lotteryDetail, status: lotteryDetail.status, prizeId: lotteryDetail.id });
-            reject(lotteryDetail);
+          this.state.canBeClick = true;
+          lotteryDetail = { integral: 68, message: "很遗憾,未抽中", prizeId: "id", restrict: 84, status: "2" };
+          lotteryDetail.integral = integral;
+          lotteryDetail.restrict = restrict;
+          this.setState({ lotteryDetail, status: lotteryDetail.status, prizeId: lotteryDetail.id });
+          reject(lotteryDetail);
           // }
         })
     });
@@ -337,9 +339,34 @@ class Page extends Component {
               })
             }
           </table>
-          <div style={{ marginTop: '20px' }}>
+          <div style={{ margin: '20px 0' }}>
             <span dangerouslySetInnerHTML={{ __html: this.state.pageInitData && this.state.pageInitData.description }}></span>
           </div>
+          {
+            this.state.o2oList && this.state.o2oList.length ?
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', }}>
+
+                {
+                  this.state.o2oList && this.state.o2oList.map((item, index) => {
+                    return (
+                      <div className='list_item' key={index} onClick={() => this.goDetail(item)}>
+                        <div style={{ height: '150px', background: 'red', borderRadius: '5px 5px 0 0' }}>
+                          <img src={item.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt='' />
+                        </div>
+                        <div style={{ padding: '10px' }}>
+                          <div>{item.name}</div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <div style={{ color: '#FF0000' }}>{item.price}元</div>
+                            <div>已售{item.sold + item.salesBase}件</div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })
+                }
+
+              </div> : <div style={{ width: '100%', height: '60vh', background: '#ccc' }}>广告</div>
+          }
         </div>
         {
           this.state.isShowPrize ?
