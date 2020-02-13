@@ -71,6 +71,8 @@ class Page extends Component {
     dealerVoList: null,
     // 会员信息
     attentionInfo: null,
+    // 转盘活动列表
+    activityList: null,
     writeOffLogId: null,
     // 核销二维码
     qrCode: '',
@@ -112,7 +114,7 @@ class Page extends Component {
     backgroundImage: null,
     backgroundColor: null,
     // 是否开启签到
-    whetherToOpen:null
+    whetherToOpen: null
   }
 
   componentDidMount() {
@@ -129,13 +131,13 @@ class Page extends Component {
   /***页面初始化************************************************************************************************** */
   pageInit = () => {
     // 页面初始化
-    let urlParams = parseUrl(this.props.location.search);
+    // let urlParams = parseUrl(this.props.location.search);
     // if (!urlParams || !urlParams.args) {
     //   Toast('参数获取失败')
     //   return;
     // }
     // let { frnId, uniqueCode, isStartActive, cityId, isgoO2o } = urlParams.args;
-    let { frnId, uniqueCode, isStartActive, cityId, isgoO2o } =this.state;
+    let { frnId, uniqueCode, isStartActive, cityId, isgoO2o } = this.state;
     // 获取缓存数据
     let isPhone = window.localStorage.getItem('isPhone');
     let res = window.localStorage.getItem('traceDetail');
@@ -152,10 +154,10 @@ class Page extends Component {
     let details = null
     let pdfUrl = null
     let createTime = null
-    let whetherToOpen=null
+    let whetherToOpen = null
     if (traceDetail) {
       details = traceDetail.details;
-      whetherToOpen=traceDetail.whetherToOpen
+      whetherToOpen = traceDetail.whetherToOpen
       pdfUrl = traceDetail.details.pdfUrl;
       createTime = dateUtil.getDateTime(traceDetail.details.createTime);
     }
@@ -166,8 +168,8 @@ class Page extends Component {
       this.getUserIp({ token, frnId, uniqueCode, isStartActive, openDrainageSetting, cityId });
     }
     this.setState({
-      frnId, token, uniqueCode,whetherToOpen,
-      isStartActive, isPhone, traceDetail, details, createTime, pdfUrl, openDrainageSetting, cityId, isgoO2o, o2oList
+      frnId, token, uniqueCode, whetherToOpen,
+      isStartActive, isPhone, traceDetail, details, createTime, pdfUrl, openDrainageSetting, cityId, isgoO2o, o2oList, tencentLng, tencentLat
     })
   }
 
@@ -402,8 +404,13 @@ class Page extends Component {
   getattentionInfo = (token) => {
     attentionInfo({ token })
       .then(data => {
+        let activityList = data.activityList;
+        let order = { activityId: '', name: '订购', logoUrl: '' };
+        let prize = { activityId: '', name: '奖品', logoUrl: '' };
+        activityList.push(order, prize)
         this.setState({
           attentionInfo: data,
+          activityList,
           bindphoneNumberIntegral: data.bindPhoneNumber,
           menberCenterIntegral: data.integral
         })
@@ -719,28 +726,45 @@ class Page extends Component {
     let pathParams = getReactRouterParams('/frontEnd/o2oDetail', parmas);
     this.props.history.push(pathParams);
   }
-  goTurntable = () => {
+  goTurntable = (item) => {
     let wxUserInfo = getCacheWxUserInfo();
     if (!wxUserInfo || !wxUserInfo.token) {
       return;
     }
     let token = wxUserInfo.token;
-    eventPage({ token })
-      .then(data => {
-        if (data.activity == 1) {
-          let prizes = this.formatList(data.prizes);
-          let pageInitData = data;
-          pageInitData.prizes = prizes
-          setTurntablePageInitData(pageInitData);
-          let pathParams = getReactRouterParams('/frontEnd/turntable', { activityId: data.activityId });
-          this.props.history.push(pathParams);
-          // let parmas={activityId:data.activityId}
-          // this.props.history.push('/frontEnd/turntable',parmas);
-        } else {
-          Toast('活动暂未开启，敬请期待')
-          return;
-        }
-      })
+    if (item.activityId) {
+
+
+      let { tencentLat, tencentLng } = this.state;
+      let latLng = `${tencentLng},${tencentLat}`;
+      let activityId = item.activityId
+      eventPage({ token, latLng, activityId })
+        .then(data => {
+          if (data.activity == 1) {
+            let prizes = this.formatList(data.prizes);
+            let pageInitData = data;
+            pageInitData.prizes = prizes;
+            let pathParams
+            setTurntablePageInitData(pageInitData);
+            if (data.style == 1) {
+              pathParams = getReactRouterParams('/frontEnd/turntable1', { activityId: data.activityId });
+            } else if (data.style == 2) {
+              pathParams = getReactRouterParams('/frontEnd/turntable2', { activityId: data.activityId });
+            }
+
+            this.props.history.push(pathParams);
+          } else {
+            Toast('活动暂未开启，敬请期待')
+            return;
+          }
+        })
+    }
+    if (item.name == '订购') {
+      this.goOrder()
+    }
+    if (item.name == '奖品') {
+      this.goPrize()
+    }
   }
   // 格式化
   formatList = (list) => {
@@ -757,18 +781,22 @@ class Page extends Component {
   clickGetDetail = () => {
     this.setState({ isgoO2o: false })
   }
-// 点击签到
-clickSingIn = () => {
-  this.props.history.push('/frontEnd/singin');
-}
+  // 点击签到
+  clickSingIn = () => {
+    this.props.history.push('/frontEnd/singin');
+  }
   render() {
     const { activeType, isgoO2o, o2oList } = this.state;
-
     return (
 
       <ActivityPage title={_title} description={_description} >
         <div style={{ background: backgroundColor, backgroundImage: `url(${backgroundImage + "?x-oss-process=image/resize,l_800"})`, minHeight: '100vh', backgroundSize: '100%', position: 'relative' }}>
           {/* ****************************防伪查询********************************* */}
+          {/* {this.state.whetherToOpen !== 1 && this.state.isShowAntiFake ?
+            <div className='checksingIn' onClick={this.clickSingIn}>
+              签到
+              </div> : null
+          } */}
           {
             this.state.isShowAntiFake ?
               <div>
@@ -790,10 +818,10 @@ clickSingIn = () => {
                       </div>
 
                       <div className='center'>
-                        {this.state.whetherToOpen==1?
-                        <div className='singin' onClick={this.clickSingIn}>签到</div>:null
+                        {this.state.whetherToOpen == 1 ?
+                          <div className='checksingIn' onClick={this.clickSingIn}>签到</div> : null
                         }
-                        
+
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', }}>
 
                           {
@@ -938,6 +966,7 @@ clickSingIn = () => {
           <MemberCenterComponent
             isShowMemberCenter={this.state.isShowMemberCenter}
             attentionInfo={this.state.attentionInfo}
+            activityList={this.state.activityList}
             bindphoneNumberIntegral={this.state.bindphoneNumberIntegral}
             _integralbindPhone={this._integralbindPhone}
             menberCenterIntegral={this.state.menberCenterIntegral}

@@ -36,7 +36,9 @@ class Page extends Component {
       status: null,
       prizesList: null,
       activityId: null,
-      o2oList: null
+      o2oList: null,
+      o2oPrize: null,
+      type: null
     }
   }
   componentDidMount() {
@@ -218,6 +220,7 @@ class Page extends Component {
       this.state.canBeClick = true;
       if (this.state.status == 1) {
         this.setState({ isShowPrize: true });
+        console.log(this.state.type)
       }
       if (this.state.status == 2) {
         Toast('很遗憾,未抽中');
@@ -254,13 +257,16 @@ class Page extends Component {
     this.setState({ isShowPrize: false });
   }
   getLottery = () => {
-    let { token, integral, restrict } = this.state;
+    let { token, integral, restrict, activityId } = this.state;
+    let tencentLat = window.localStorage.getItem('tencentLat');
+    let tencentLng = window.localStorage.getItem('tencentLng');
+    let latLng = `${tencentLng},${tencentLat}`;
     let lotteryDetail = null;
     return new Promise((resolve, reject) => {
-      lottery({ token })
+      lottery({ token, latLng, activityId })
         .then(data => {
           lotteryDetail = data.data;
-          this.setState({ lotteryDetail, status: lotteryDetail.status, prizeId: lotteryDetail.id });
+          this.setState({ lotteryDetail, status: lotteryDetail.status, prizeId: lotteryDetail.id, type: lotteryDetail.type });
           resolve(lotteryDetail);
         })
         .catch(res => {
@@ -284,6 +290,21 @@ class Page extends Component {
   }
   goPrizeInfo = () => {
     let pathParams = getReactRouterParams('/frontEnd/prizeInfo', { id: this.state.prizeId });
+    this.props.history.push(pathParams);
+  }
+    // 订购
+    goOrder = () => {
+      let params = {}
+      params.activeType = 0
+      let pathParams = getReactRouterParams('/frontEnd/order', params);
+      this.props.history.push(pathParams);
+    }
+    // 详情
+  goDetail = (item) => {
+    let parmas = {};
+    parmas.id = item.id
+    window.localStorage.setItem('name', item.name);
+    let pathParams = getReactRouterParams('/frontEnd/o2oDetail', parmas);
     this.props.history.push(pathParams);
   }
   //UI渲染
@@ -372,26 +393,49 @@ class Page extends Component {
           this.state.isShowPrize ?
             <div>
               <div className='box'>
-                <div className='integral' style={{ borderRadius: '10px' }}>
-                  {
-                    !this.state.isIntegralBind ? <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 10px 0 10px' }}>
-                      <div style={{ lineHeight: '40px' }}></div>
-                      <img src='/image/close.png' className='closeimg' onClick={this.closeModal} alt='' />
+                {this.state.type == 1 ?
+                  <div className='integral' style={{ borderRadius: '10px' }}>
+                    {
+                      !this.state.isIntegralBind ? <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 10px 0 10px' }}>
+                        <div style={{ lineHeight: '40px' }}></div>
+                        <img src='/image/close.png' className='closeimg' onClick={this.closeModal} alt='' />
+                      </div>
+                        : null
+                    }
+                    <div style={{ height: '70vh', textAlign: 'center' }}>
+                      <div style={{ textAlign: 'center' }}>{this.state.lotteryDetail && this.state.lotteryDetail.message}等奖</div>
+                      <div style={{ height: '190px', width: '160px', margin: '10px auto' }}>
+                        <img src={this.state.lotteryDetail && this.state.lotteryDetail.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt='' />
+                      </div>
+                      <div style={{ width: '50%', whiteSpace: 'pre-wrap', margin: '0 auto' }}>{this.state.lotteryDetail && this.state.lotteryDetail.name}</div>
+                      <div style={{ margin: '10px 0' }} onClick={this.goPrize}>我的-奖品 页面查看中奖纪录</div>
+                      <div style={{ margin: '60px 10px 0 10px', background: '#FF2B64', height: '40px', lineHeight: '40px', color: '#fff', borderRadius: '5px', textAlign: 'center' }} onClick={this.goPrizeInfo}>填写物流信息完成兑奖</div>
                     </div>
-                      : null
-                  }
-                  <div style={{ height: '70vh', textAlign: 'center' }}>
-                    <div style={{ textAlign: 'center' }}>{this.state.lotteryDetail && this.state.lotteryDetail.message}</div>
-                    <div style={{ height: '190px', width: '160px', margin: '10px auto' }}>
-                      <img src={this.state.lotteryDetail && this.state.lotteryDetail.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt='' />
+                  </div> :
+                  <div className='integral' style={{ borderRadius: '10px' }}>
+                    {
+                      !this.state.isIntegralBind ? <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 10px 0 10px' }}>
+                        <div style={{ lineHeight: '40px' }}></div>
+                        <img src='/image/close.png' className='closeimg' onClick={this.closeModal} alt='' />
+                      </div>
+                        : null
+                    }
+                    <div style={{ height: '70vh', textAlign: 'center' }}>
+                      <div style={{ textAlign: 'center' }}>{this.state.lotteryDetail && this.state.lotteryDetail.message}等奖</div>
+                      <div style={{ height: '190px', width: '160px', margin: '10px auto' }}>
+                        <img src={this.state.lotteryDetail && this.state.lotteryDetail.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt='' />
+                      </div>
+                      <div style={{ width: '50%', whiteSpace: 'pre-wrap', margin: '0 auto' }}>{this.state.lotteryDetail && this.state.lotteryDetail.name}</div>
+                      <div style={{ margin: '10px 0' }} onClick={this.goPrize}>我的-订购 页面查看中奖纪录</div>
+                      <div style={{ margin: '60px 10px 0 10px', background: '#FF2B64', height: '40px', lineHeight: '40px', color: '#fff', borderRadius: '5px', textAlign: 'center' }} onClick={this.goOrder}>确认</div>
                     </div>
-                    <div style={{ width: '50%', whiteSpace: 'pre-wrap', margin: '0 auto' }}>{this.state.lotteryDetail && this.state.lotteryDetail.name}</div>
-                    <div style={{ margin: '10px 0' }} onClick={this.goPrize}>我的-奖品 页面查看中奖纪录</div>
-                    <div style={{ margin: '60px 10px 0 10px', background: '#FF2B64', height: '40px', lineHeight: '40px', color: '#fff', borderRadius: '5px', textAlign: 'center' }} onClick={this.goPrizeInfo}>填写物流信息完成兑奖</div>
                   </div>
-                </div>
+
+                }
               </div>
-            </div> : null
+            </div>
+            :
+            null
         }
       </ActivityPage >
     );

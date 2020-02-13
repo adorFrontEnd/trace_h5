@@ -37,18 +37,43 @@ export default class Page extends Component {
               </div>
             </div>
             <div className='itemList' style={{ width: '100%', justifyContent: 'space-around', padding: '0' }} >
-              <div className='item' onClick={this.props.goOrder}>
+              {/* <div className='item' onClick={this.props.goOrder}>
                 <img src='/image/order.png' style={{ height: '35px', width: '35px', marginBottom: '20px' }} alt=''></img>
                 <div>订购</div>
+              </div> */}
+
+              <div style={{ display: 'flex',justifyContent: 'space-around',flexWrap: 'wrap'}}>
+
+                {
+                  this.props.activityList && this.props.activityList.map((item, index) => {
+                    return (
+
+                      <div className='item' onClick={() => this.props.goTurntable(item)}>
+                        {
+                        item.name=='订购'?
+                        <img src='/image/order.png' style={{ height: '35px', width: '35px', marginBottom: '20px' }} alt=''></img>:null
+                        }
+                        {
+                        item.name=='奖品'?
+                        <img src='/image/prize.png' style={{ height: '35px', width: '35px', marginBottom: '20px' }} alt=''></img>:null
+                        }
+                        {
+                            item.name !='奖品' ||item.name !='订购'?<img src={item.logoUrl} style={{ height: '35px', width: '35px', marginBottom: '20px' }} alt=''></img>:null
+                        }
+                        
+                        <div>{item.name}</div>
+                      </div>
+
+
+                    )
+                  })
+                }
+
               </div>
-              <div style={{ borderLeft: '1px solid #f2f2f2', borderRight: '1px solid #f2f2f2' }} className='item' onClick={this.props.goTurntable}>
-                <img src='/image/turntable.png' style={{ height: '35px', width: '35px', marginBottom: '20px' }} alt=''></img>
-                <div>大转盘</div>
-              </div>
-              <div className='item' onClick={this.props.goPrize}>
+              {/* <div className='item' onClick={this.props.goPrize}>
                 <img src='/image/prize.png' style={{ height: '35px', width: '35px', marginBottom: '20px' }} alt=''></img>
                 <div>奖品</div>
-              </div>
+              </div> */}
             </div>
 
           </div>
