@@ -36,31 +36,31 @@ export default class Page extends Component {
                 <div >{this.props.menberCenterIntegral}</div>
               </div>
             </div>
-            <div className='itemList' style={{ width: '100%', justifyContent: 'space-around', padding: '0' }} >
+            <div className='itemList' style={{ width: '100%', padding: '0' }} >
               {/* <div className='item' onClick={this.props.goOrder}>
                 <img src='/image/order.png' style={{ height: '35px', width: '35px', marginBottom: '20px' }} alt=''></img>
                 <div>订购</div>
               </div> */}
 
-              <div style={{ display: 'flex',justifyContent: 'space-around',flexWrap: 'wrap'}}>
+              <div style={{ display: 'flex', flexWrap: 'wrap' }}>
 
                 {
                   this.props.activityList && this.props.activityList.map((item, index) => {
                     return (
 
-                      <div className='item' onClick={() => this.props.goTurntable(item)}>
+                      <div className='item' onClick={() => this.props.goTurntable(item)} key={index}>
                         {
-                        item.name=='订购'?
-                        <img src='/image/order.png' style={{ height: '35px', width: '35px', marginBottom: '20px' }} alt=''></img>:null
+                          item.name == '订购' ?
+                            <img src='/image/order.png' style={{ height: '35px', width: '35px', marginBottom: '20px' }} alt=''></img> : null
                         }
                         {
-                        item.name=='奖品'?
-                        <img src='/image/prize.png' style={{ height: '35px', width: '35px', marginBottom: '20px' }} alt=''></img>:null
+                          item.name == '奖品' ?
+                            <img src='/image/prize.png' style={{ height: '35px', width: '35px', marginBottom: '20px' }} alt=''></img> : null
                         }
                         {
-                            item.name !='奖品' ||item.name !='订购'?<img src={item.logoUrl} style={{ height: '35px', width: '35px', marginBottom: '20px' }} alt=''></img>:null
+                          item.name != '奖品' && item.name != '订购' ? <img src={item.logoUrl} style={{ height: '35px', width: '35px', marginBottom: '20px' }} alt=''></img> : null
                         }
-                        
+
                         <div>{item.name}</div>
                       </div>
 

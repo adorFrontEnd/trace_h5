@@ -167,8 +167,7 @@ class Page extends Component {
     let { frnId, uniqueCode, urlParams, latitudeAndLongitude } = this.state;
     window.localStorage.setItem('_frnId', frnId);
     let code = urlParams.args.code;
-    let wxUserInfo = getCacheWxUserInfo();
-    let token = (wxUserInfo && wxUserInfo.token) || this.state.token;
+
     // 判断用户是否已经关注 
     wxLogin({ code, frnId })
       .then(data => {
@@ -181,7 +180,9 @@ class Page extends Component {
             this.getSecurityCheck(null, uniqueCode, frnId, cityId);
             return
           } else {
-            this.getarea(latitudeAndLongitude, uniqueCode, frnId, cityId,token);
+            let wxUserInfo = getCacheWxUserInfo();
+            let token = (wxUserInfo && wxUserInfo.token) || this.state.token;
+            this.getarea(latitudeAndLongitude, uniqueCode, frnId, cityId, token);
           }
         } else {
           //未关注提示用户去关注微信公众号
@@ -234,7 +235,7 @@ class Page extends Component {
               let { latitude, longitude } = data;
               let tencentLng = longitude;
               let tencentLat = latitude;
-              console.log(tencentLng,tencentLat)
+              console.log(tencentLng, tencentLat)
               window.localStorage.setItem('tencentLng', tencentLng);
               window.localStorage.setItem('tencentLat', tencentLat);
             }
@@ -250,7 +251,8 @@ class Page extends Component {
 
 
   // 获取区域
-  getarea = (latitudeAndLongitude, uniqueCode, frnId, cityId,token) => {
+  getarea = (latitudeAndLongitude, uniqueCode, frnId, cityId, token) => {
+    console.log(token)
     getArea({ latitudeAndLongitude, token })
       .then(res => {
         if (res.length == 0) {
@@ -268,7 +270,7 @@ class Page extends Component {
       })
   }
   // 获取用户ip
-  getUserIp = (uniqueCode, frnId, cityId,token) => {
+  getUserIp = (uniqueCode, frnId, cityId, token) => {
     getIp()
       .then(data => {
         let ip = data.query;

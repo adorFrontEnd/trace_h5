@@ -131,13 +131,13 @@ class Page extends Component {
   /***页面初始化************************************************************************************************** */
   pageInit = () => {
     // 页面初始化
-    // let urlParams = parseUrl(this.props.location.search);
-    // if (!urlParams || !urlParams.args) {
-    //   Toast('参数获取失败')
-    //   return;
-    // }
-    // let { frnId, uniqueCode, isStartActive, cityId, isgoO2o } = urlParams.args;
-    let { frnId, uniqueCode, isStartActive, cityId, isgoO2o } = this.state;
+    let urlParams = parseUrl(this.props.location.search);
+    if (!urlParams || !urlParams.args) {
+      Toast('参数获取失败')
+      return;
+    }
+    let { frnId, uniqueCode, isStartActive, cityId, isgoO2o } = urlParams.args;
+    // let { frnId, uniqueCode, isStartActive, cityId, isgoO2o } = this.state;
     // 获取缓存数据
     let isPhone = window.localStorage.getItem('isPhone');
     let res = window.localStorage.getItem('traceDetail');
@@ -829,7 +829,7 @@ class Page extends Component {
                               return (
                                 <div className='list_item' key={index} onClick={() => this.goDetail(item)}>
                                   <div style={{ height: '150px', background: 'red', borderRadius: '5px 5px 0 0' }}>
-                                    <img src={item.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt='' />
+                                    <img src={item.image} style={{ width: '100%', height: '100%', objectFit: 'cover',borderRadius: '5px 5px 0 0' }} alt='' />
                                   </div>
                                   <div style={{ padding: '10px' }}>
                                     <div>{item.name}</div>

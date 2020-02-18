@@ -22,7 +22,7 @@ class Page extends Component {
   componentDidMount() {
     let wxUserInfo = getCacheWxUserInfo();
     let result = window.localStorage.getItem('o2oList');
-    let o2oList = JSON.parse(result).slice(0,4);
+    let o2oList = JSON.parse(result).slice(0, 4);
     if (!wxUserInfo || !wxUserInfo.token) {
       return;
     }
@@ -48,12 +48,20 @@ class Page extends Component {
         console.log(data)
       })
   }
+  // 详情
+  goDetail = (item) => {
+    let parmas = {};
+    parmas.id = item.id
+    window.localStorage.setItem('name', item.name);
+    let pathParams = getReactRouterParams('/frontEnd/o2oDetail', parmas);
+    this.props.history.push(pathParams);
+  }
   //UI渲染
   render() {
     return (
       <ActivityPage title={_title} description={_description} >
         <div style={{ background: '#f2f2f2', minHeight: '100vh', padding: '10px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+          <div style={{ width: '100%', marginBottom: '10px', overflowX: 'scroll', whiteSpace: 'nowrap' }}>
             {
               this.state.singInList && this.state.singInList.list.map((item, index) => {
                 return (
@@ -71,32 +79,34 @@ class Page extends Component {
               :
               <div className='comfirmSingIn' onClick={this.clickComfirmSinIn}>{this.state.buttonMessage}</div>
           }
+          <div style={{marginBottom:'10px'}}>
+          <span dangerouslySetInnerHTML={{ __html: this.state.singInList&&this.state.singInList.remark }}></span>
+            </div>
+          {
+            this.state.o2oList && this.state.o2oList.length ?
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', }}>
 
-         {
-           this.state.o2oList&&this.state.o2oList.length?
-           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', }}>
+                {
+                  this.state.o2oList && this.state.o2oList.map((item, index) => {
+                    return (
+                      <div className='list_item' key={index} onClick={() => this.goDetail(item)}>
+                        <div style={{ height: '150px', background: 'red', borderRadius: '5px 5px 0 0' }}>
+                          <img src={item.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt='' />
+                        </div>
+                        <div style={{ padding: '10px' }}>
+                          <div>{item.name}</div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <div style={{ color: '#FF0000' }}>{item.price}元</div>
+                            <div>已售{item.sold + item.salesBase}件</div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })
+                }
 
-           {
-             this.state.o2oList && this.state.o2oList.map((item, index) => {
-               return (
-                 <div className='list_item' key={index} onClick={() => this.goDetail(item)}>
-                   <div style={{ height: '150px', background: 'red', borderRadius: '5px 5px 0 0' }}>
-                     <img src={item.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt='' />
-                   </div>
-                   <div style={{ padding: '10px' }}>
-                     <div>{item.name}</div>
-                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                       <div style={{ color: '#FF0000' }}>{item.price}元</div>
-                       <div>已售{item.sold + item.salesBase}件</div>
-                     </div>
-                   </div>
-                 </div>
-               )
-             })
-           }
-
-         </div>:<div style={{width:'100%',height:'60vh',background:'#ccc'}}>广告</div>
-         }
+              </div> : <div style={{ width: '100%', height: '60vh', background: '#ccc' }}>广告</div>
+          }
         </div>
       </ActivityPage >
     );

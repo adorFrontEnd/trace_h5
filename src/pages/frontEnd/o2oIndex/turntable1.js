@@ -372,7 +372,7 @@ class Page extends Component {
                     return (
                       <div className='list_item' key={index} onClick={() => this.goDetail(item)}>
                         <div style={{ height: '150px', background: 'red', borderRadius: '5px 5px 0 0' }}>
-                          <img src={item.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt='' />
+                          <img src={item.image} style={{ width: '100%', height: '100%', objectFit: 'cover',borderRadius: '5px 5px 0 0' }} alt='' />
                         </div>
                         <div style={{ padding: '10px' }}>
                           <div>{item.name}</div>

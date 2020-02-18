@@ -197,8 +197,6 @@ export default class O2oIndex extends Component {
           setTurntablePageInitData(data);
           let pathParams = getReactRouterParams('/frontEnd/turntable', { activityId: data.activityId });
           this.props.history.push(pathParams);
-          // let parmas={activityId:data.activityId}
-          // this.props.history.push('/frontEnd/turntable',parmas);
         } else {
           Toast('活动暂未开启，敬请期待')
           return;
@@ -232,7 +230,7 @@ export default class O2oIndex extends Component {
                                 return (
                                   <div className='list_item' key={index} onClick={() => this.goDetail(item)}>
                                     <div style={{ height: '150px', background: 'red', borderRadius: '5px 5px 0 0' }}>
-                                      <img src={item.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt='' />
+                                      <img src={item.image} style={{ width: '100%', height: '100%', objectFit: 'cover',borderRadius: '5px 5px 0 0' }} alt='' />
                                     </div>
                                     <div style={{ padding: '10px' }}>
                                       <div>{item.name}</div>

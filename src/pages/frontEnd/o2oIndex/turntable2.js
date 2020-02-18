@@ -30,7 +30,8 @@ export default class demo extends Component {
             lotteryDetail: null,
             status: null,
             isShowPrize: false,
-            o2oList:null
+            o2oList: null,
+            isShow: false
         }
     }
     componentWillMount() {
@@ -52,7 +53,8 @@ export default class demo extends Component {
         let arr = []
         if (list && list.length < 8) {
             for (let i = 0; i < list.length; i++) {
-                let a = { id: "id", prizeLevel: "谢谢参与", prizeName: "谢谢参与", color: "#FFEF7B", orders: 4 }
+                
+                let a = { id: "id", prizeLevel: "谢谢参与", prizeName: "谢谢参与", color: "#FFEF7B", orders: 4,prizeImage:'http://images.669pic.com/element_pic/23/50/19/62/01984930591c480507111f2918aed000.jpg%21w700wb' }
                 arr.push(list[i])
                 arr.push(a);
             }
@@ -62,7 +64,7 @@ export default class demo extends Component {
             integral: pageInitData.integral,
             token,
             restrict: pageInitData.restrict,
-            activityId,o2oList
+            activityId, o2oList
         })
     }
     // 格式化时间
@@ -93,93 +95,28 @@ export default class demo extends Component {
         }
     }
     handlePlay() {
-        let { list,integral,restrict} = this.state;
-        if(integral==0){
+        let { token, integral, restrict, activityId, list } = this.state;
+        if (integral == 0) {
             Toast('积分不足，无法参与抽奖');
-            return;
-        }
-        if(restrict==0){
-            Toast('次数不足，无法参与抽奖');
-            return;
-        }
-        this.getLottery()
-            .then(data => {
-                let prizeIdIndex = (list || []).findIndex((item) => item.id === data.prizeId);
-                this.setState({
-                    prizeIdIndex,
-                    activedId: 0,
-                    prizeId: data.id
-                })
-                // 随机算出一个动画执行的最小次数，这里可以随机变更数值，按自己的需求来
-                let times = this.state.list.length * Math.floor(Math.random() * 5 + 4)
-                this.setState({
-                    times: times
-                })
-                // 抽奖正式开始
-                this.begin = setInterval(() => {
-                    let num;
-                    if (this.state.activedId === prizeIdIndex && this.state.actTimes > this.state.times) {
-                        // 符合上述所有条件时才是中奖的时候，两个ID相同并且动画执行的次数大于(或等于也行)设定的最小次数
-                        clearInterval(this.begin)
-                        this.setState({
-                            isRolling: false
-                        })
-                        if (this.state.status == 1) {
-                            setTimeout(() => {
-                                this.setState({ isShowPrize: true });
-                            }, 1000)
-                        }
-                        if (this.state.status == 2) {
-                            Toast('很遗憾,未抽中');
-                            this.setState({
-                                activedId: '',
-                                prizeIdIndex: null,
-                                times: 0,
-                                actTimes: 0,
-                                isRolling: false
-                            })
-                        }
-                        return;
-                    }
-
-                    // 以下是动画执行时对id的判断
-                    if (this.state.activedId === '') {
-                        num = 0
-                        this.setState({
-                            activedId: num
-                        })
-                    } else {
-                        num = this.state.activedId
-                        if (num === 11) {
-                            num = 0
-                            this.setState({
-                                activedId: num
-                            })
-                        } else {
-                            num = num + 1
-                            this.setState({
-                                activedId: num
-                            })
-                        }
-                    }
-                    this.setState({
-                        actTimes: this.state.actTimes + 1
-                    })
-
-                }, 80)
+            this.setState({
+                activedId: '',
+                prizeIdIndex: null,
+                times: 0,
+                actTimes: 0,
+                isRolling: false,
+                isShowPrize: false
             })
-
-
-
-    }
-    // 点击抽奖
-    getLottery = () => {
-        let { token, integral, restrict, activityId } = this.state;
-        if(integral==0){
-            Toast('积分不足，无法参与抽奖');
             return;
         }
-        if(restrict==0){
+        if (restrict == 0) {
+            this.setState({
+                activedId: '',
+                prizeIdIndex: null,
+                times: 0,
+                actTimes: 0,
+                isRolling: false,
+                isShowPrize: false
+            })
             Toast('次数不足，无法参与抽奖');
             return;
         }
@@ -187,29 +124,102 @@ export default class demo extends Component {
         let tencentLng = window.localStorage.getItem('tencentLng');
         let latLng = `${tencentLng},${tencentLat}`;
         let lotteryDetail = null;
-        return new Promise((resolve, reject) => {
-            lottery({ token, activityId, latLng })
-                .then(data => {
-                    lotteryDetail = data.data;
+
+        lottery({ token, activityId, latLng })
+            .then(data => {
+             if(data.status==4){
+                Toast('积分不足，无法参与抽奖');
+                this.setState({
+                    activedId: '',
+                    prizeIdIndex: null,
+                    times: 0,
+                    actTimes: 0,
+                    isRolling: false,
+                    isShowPrize: false
+                })
+                return;
+             }
+                lotteryDetail = data.data;
+                this.startLottry(list, lotteryDetail);
+                this.setState({
+                    lotteryDetail,
+                    status: lotteryDetail.status,
+                    prizeId: lotteryDetail.id,
+                    integral: lotteryDetail.integral, restrict: lotteryDetail.restrict
+                });
+            })
+            .catch(res => {
+                let lotteryDetail = { integral: 68, message: "很遗憾,未抽中", prizeId: "id", restrict: 84, status: "2" };
+                lotteryDetail.integral = integral;
+                lotteryDetail.restrict = restrict;
+                this.startLottry(list, lotteryDetail);
+            })
+
+
+
+
+    }
+
+    startLottry = (list, data) => {
+        let prizeIdIndex = (list || []).findIndex((item) => item.id === data.prizeId);
+        this.setState({
+            prizeIdIndex,
+            activedId: 0,
+            prizeId: data.id
+        })
+        // 随机算出一个动画执行的最小次数，这里可以随机变更数值，按自己的需求来
+        let times = this.state.list.length * Math.floor(Math.random() * 5 + 4)
+        this.setState({
+            times: times
+        })
+        // 抽奖正式开始
+        this.begin = setInterval(() => {
+            let num;
+            if (this.state.activedId === prizeIdIndex && this.state.actTimes > this.state.times) {
+                // 符合上述所有条件时才是中奖的时候，两个ID相同并且动画执行的次数大于(或等于也行)设定的最小次数
+                clearInterval(this.begin)
+                this.setState({
+                    isRolling: false
+                })
+                if (this.state.status == 1) {
+                    setTimeout(() => {
+                        this.setState({ isShowPrize: true });
+                    }, 1000)
+                }
+                if (this.state.status == 2) {
+                    setTimeout(() => {
+                        Toast('很遗憾,未抽中');
+                    }, 1000)
+
+                }
+                return;
+            }
+
+            // 以下是动画执行时对id的判断
+            if (this.state.activedId === '') {
+                num = 0
+                this.setState({
+                    activedId: num
+                })
+            } else {
+                num = this.state.activedId
+                if (num === 11) {
+                    num = 0
                     this.setState({
-                        lotteryDetail,
-                        status: lotteryDetail.status,
-                        prizeId: lotteryDetail.id,
-                        integral: lotteryDetail.integral, restrict: lotteryDetail.restrict
-                    });
-                    resolve(lotteryDetail);
-                })
-                .catch(res => {
-                    // if (res == 'trace.0024') {
-                    this.state.canBeClick = true;
-                    lotteryDetail = { integral: 68, message: "很遗憾,未抽中", prizeId: "id", restrict: 84, status: "2" };
-                    lotteryDetail.integral = integral;
-                    lotteryDetail.restrict = restrict;
-                    this.setState({ lotteryDetail, status: lotteryDetail.status, prizeId: lotteryDetail.id });
-                    reject(lotteryDetail);
-                    // }
-                })
-        });
+                        activedId: num
+                    })
+                } else {
+                    num = num + 1
+                    this.setState({
+                        activedId: num
+                    })
+                }
+            }
+            this.setState({
+                actTimes: this.state.actTimes + 1
+            })
+
+        }, 80)
     }
     closeModal = () => {
         this.setState({
@@ -239,17 +249,17 @@ export default class demo extends Component {
         this.props.history.push(pathParams);
     }
     // 详情
-  goDetail = (item) => {
-    let parmas = {};
-    parmas.id = item.id
-    window.localStorage.setItem('name', item.name);
-    let pathParams = getReactRouterParams('/frontEnd/o2oDetail', parmas);
-    this.props.history.push(pathParams);
-  }
+    goDetail = (item) => {
+        let parmas = {};
+        parmas.id = item.id
+        window.localStorage.setItem('name', item.name);
+        let pathParams = getReactRouterParams('/frontEnd/o2oDetail', parmas);
+        this.props.history.push(pathParams);
+    }
     render() {
         const { list, activedId, prizeIdIndex } = this.state;
         return (
-            <div style={{background:'#ff4444',minHeight: '100vh',backgroundImage: `url('https://img.yzcdn.cn/public_files/2019/11/06/6ced8d17e8acc56d09464a17b85105c8.png')`,backgroundSize:'100% auto', backgroundRepeat: 'no-repeat' }}>
+            <div style={{ background: '#ff4444', minHeight: '100vh', backgroundImage: `url('https://img.yzcdn.cn/public_files/2019/11/06/6ced8d17e8acc56d09464a17b85105c8.png')`, backgroundSize: '100% auto', backgroundRepeat: 'no-repeat' }}>
                 <div style={{ padding: '10px' }}>
 
                     <div className='roulette-container l-scene__roulette'>
@@ -273,82 +283,82 @@ export default class demo extends Component {
                             <div className='c-btn__chance'>剩余{this.state.restrict}次机会</div>
                         </div>
                     </div>
-                    <div style={{margin:'0 0 10px 10px',color:'#fff',fontSize:'16px'}}>我的积分:{this.state.integral}</div>
+                    <div style={{ margin: '0 0 10px 10px', color: '#fff', fontSize: '16px' }}>我的积分:{this.state.integral}</div>
                     {
-            this.state.o2oList && this.state.o2oList.length ?
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap',padding:'10px' }}>
+                        this.state.o2oList && this.state.o2oList.length ?
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', padding: '10px' }}>
 
-                {
-                  this.state.o2oList && this.state.o2oList.map((item, index) => {
-                    return (
-                      <div className='list_item' key={index} onClick={() => this.goDetail(item)}>
-                        <div style={{ height: '150px', background: 'red', borderRadius: '5px 5px 0 0' }}>
-                          <img src={item.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt='' />
-                        </div>
-                        <div style={{ padding: '10px' }}>
-                          <div>{item.name}</div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <div style={{ color: '#FF0000' }}>{item.price}元</div>
-                            <div>已售{item.sold + item.salesBase}件</div>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })
-                }
+                                {
+                                    this.state.o2oList && this.state.o2oList.map((item, index) => {
+                                        return (
+                                            <div className='list_item' key={index} onClick={() => this.goDetail(item)}>
+                                                <div style={{ height: '150px', background: 'red', borderRadius: '5px 5px 0 0' }}>
+                                                    <img src={item.image} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '5px 5px 0 0' }} alt='' />
+                                                </div>
+                                                <div style={{ padding: '10px' }}>
+                                                    <div>{item.name}</div>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                        <div style={{ color: '#FF0000' }}>{item.price}元</div>
+                                                        <div>已售{item.sold + item.salesBase}件</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )
+                                    })
+                                }
 
-              </div> : <div style={{ width: '100%', height: '60vh', background: '#ccc' }}>广告</div>
-          }
-                   
+                            </div> : <div style={{ width: '100%', height: '60vh', background: '#ccc' }}>广告</div>
+                    }
+
                 </div>
                 {
-                        this.state.isShowPrize ?
-                            <div>
-                                <div className='box'>
-                                    {this.state.lotteryDetail.type == 1 ?
-                                        <div className='integral' style={{ borderRadius: '10px' }}>
-                                            {
-                                                !this.state.isIntegralBind ? <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 10px 0 10px' }}>
-                                                    <div style={{ lineHeight: '40px' }}></div>
-                                                    <img src='/image/close.png' className='closeimg' onClick={this.closeModal} alt='' />
-                                                </div>
-                                                    : null
-                                            }
-                                            <div style={{ height: '70vh', textAlign: 'center' }}>
-                                                <div style={{ textAlign: 'center' }}>{this.state.lotteryDetail && this.state.lotteryDetail.message}等奖</div>
-                                                <div style={{ height: '190px', width: '160px', margin: '10px auto' }}>
-                                                    <img src={this.state.lotteryDetail && this.state.lotteryDetail.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt='' />
-                                                </div>
-                                                <div style={{ width: '50%', whiteSpace: 'pre-wrap', margin: '0 auto' }}>{this.state.lotteryDetail && this.state.lotteryDetail.name}</div>
-                                                <div style={{ margin: '10px 0' }} onClick={this.goPrize}>我的-奖品 页面查看中奖纪录</div>
-                                                <div style={{ margin: '60px 10px 0 10px', background: '#FF2B64', height: '40px', lineHeight: '40px', color: '#fff', borderRadius: '5px', textAlign: 'center' }} onClick={this.goPrizeInfo}>填写物流信息完成兑奖</div>
+                    this.state.isShowPrize ?
+                        <div>
+                            <div className='box'>
+                                {this.state.lotteryDetail.type == 1 ?
+                                    <div className='integral' style={{ borderRadius: '10px' }}>
+                                        {
+                                            !this.state.isIntegralBind ? <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 10px 0 10px' }}>
+                                                <div style={{ lineHeight: '40px' }}></div>
+                                                <img src='/image/close.png' className='closeimg' onClick={this.closeModal} alt='' />
                                             </div>
-                                        </div> :
-                                        <div className='integral' style={{ borderRadius: '10px' }}>
-                                            {
-                                                !this.state.isIntegralBind ? <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 10px 0 10px' }}>
-                                                    <div style={{ lineHeight: '40px' }}></div>
-                                                    <img src='/image/close.png' className='closeimg' onClick={this.closeModal} alt='' />
-                                                </div>
-                                                    : null
-                                            }
-                                            <div style={{ height: '70vh', textAlign: 'center' }}>
-                                                <div style={{ textAlign: 'center' }}>{this.state.lotteryDetail && this.state.lotteryDetail.message}等奖</div>
-                                                <div style={{ height: '190px', width: '160px', margin: '10px auto' }}>
-                                                    <img src={this.state.lotteryDetail && this.state.lotteryDetail.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt='' />
-                                                </div>
-                                                <div style={{ width: '50%', whiteSpace: 'pre-wrap', margin: '0 auto' }}>{this.state.lotteryDetail && this.state.lotteryDetail.name}</div>
-                                                <div style={{ margin: '10px 0' }} onClick={this.goPrize}>我的-订购 页面查看中奖纪录</div>
-                                                <div style={{ margin: '60px 10px 0 10px', background: '#FF2B64', height: '40px', lineHeight: '40px', color: '#fff', borderRadius: '5px', textAlign: 'center' }} onClick={this.goOrder}>确认</div>
+                                                : null
+                                        }
+                                        <div style={{ height: '70vh', textAlign: 'center' }}>
+                                            <div style={{ textAlign: 'center' }}>{this.state.lotteryDetail && this.state.lotteryDetail.message}等奖</div>
+                                            <div style={{ height: '190px', width: '160px', margin: '10px auto' }}>
+                                                <img src={this.state.lotteryDetail && this.state.lotteryDetail.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt='' />
                                             </div>
+                                            <div style={{ width: '50%', whiteSpace: 'pre-wrap', margin: '0 auto' }}>{this.state.lotteryDetail && this.state.lotteryDetail.name}</div>
+                                            <div style={{ margin: '10px 0' }} onClick={this.goPrize}>我的-奖品 页面查看中奖纪录</div>
+                                            <div style={{ margin: '60px 10px 0 10px', background: '#FF2B64', height: '40px', lineHeight: '40px', color: '#fff', borderRadius: '5px', textAlign: 'center' }} onClick={this.goPrizeInfo}>填写物流信息完成兑奖</div>
                                         </div>
+                                    </div> :
+                                    <div className='integral' style={{ borderRadius: '10px' }}>
+                                        {
+                                            !this.state.isIntegralBind ? <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 10px 0 10px' }}>
+                                                <div style={{ lineHeight: '40px' }}></div>
+                                                <img src='/image/close.png' className='closeimg' onClick={this.closeModal} alt='' />
+                                            </div>
+                                                : null
+                                        }
+                                        <div style={{ height: '70vh', textAlign: 'center' }}>
+                                            <div style={{ textAlign: 'center' }}>{this.state.lotteryDetail && this.state.lotteryDetail.message}等奖</div>
+                                            <div style={{ height: '190px', width: '160px', margin: '10px auto' }}>
+                                                <img src={this.state.lotteryDetail && this.state.lotteryDetail.image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt='' />
+                                            </div>
+                                            <div style={{ width: '50%', whiteSpace: 'pre-wrap', margin: '0 auto' }}>{this.state.lotteryDetail && this.state.lotteryDetail.name}</div>
+                                            <div style={{ margin: '10px 0' }} onClick={this.goPrize}>我的-订购 页面查看中奖纪录</div>
+                                            <div style={{ margin: '60px 10px 0 10px', background: '#FF2B64', height: '40px', lineHeight: '40px', color: '#fff', borderRadius: '5px', textAlign: 'center' }} onClick={this.goOrder}>确认</div>
+                                        </div>
+                                    </div>
 
-                                    }
-                                </div>
+                                }
                             </div>
-                            :
-                            null
-                    }
+                        </div>
+                        :
+                        null
+                }
             </div>
         );
     }
