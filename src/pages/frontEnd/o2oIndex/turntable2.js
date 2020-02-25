@@ -154,10 +154,6 @@ export default class demo extends Component {
                 lotteryDetail.restrict = restrict;
                 this.startLottry(list, lotteryDetail);
             })
-
-
-
-
     }
 
     startLottry = (list, data) => {

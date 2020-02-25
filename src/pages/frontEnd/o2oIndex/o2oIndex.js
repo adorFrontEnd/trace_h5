@@ -7,7 +7,7 @@ import Toast from '../../../utils/toast';
 import { wxConfigInit, getUserLocation } from '../../../api/wx/wxConfig';
 import { getWxConfig } from '../../../api/wx/common';
 import { parseUrl, getReactRouterParams } from '../../../utils/urlUtils';
-import { getArea,eventPage} from '../../../api/frontEnd/o2oIndex';
+import { getArea, eventPage } from '../../../api/frontEnd/o2oIndex';
 import { setCacheWxUserInfo, getCacheWxUserInfo } from '../../../middleware/localStorage/wxUser';
 import { setTurntablePageInitData } from '../../../middleware/localStorage/o2oIndex';
 import { attentionInfo } from '../../../api/frontEnd/menberCenter';
@@ -21,11 +21,13 @@ export default class O2oIndex extends Component {
     isShowMemberCenter: false,
     isShow: false,
     isgoO2o: true,
-    
+    activityList: null,
     // 会员信息
     attentionInfo: null,
     bindphoneNumberIntegral: null,
-    menberCenterIntegral: null
+    menberCenterIntegral: null,
+    tencentLng: null,
+    tencentLat: null
     // token: 'kcuFhL8NStlOPtyCmEAQKRGHJ7gHWjCZX0gG1zYSCuT5yY31pomDZYIpgC5RVnst'
   }
   componentDidMount() {
@@ -63,7 +65,7 @@ export default class O2oIndex extends Component {
             let tencentLng = longitude;
             let tencentLat = latitude;
             let latitudeAndLongitude = `${tencentLng},${tencentLat}`;
-            this.setState({ latitudeAndLongitude });
+            this.setState({ latitudeAndLongitude, tencentLng, tencentLat });
             return getArea({ latitudeAndLongitude, token });
           })
           .then(res => {
@@ -95,7 +97,7 @@ export default class O2oIndex extends Component {
               let tencentLng = longitude;
               let tencentLat = latitude;
               let latitudeAndLongitude = `${tencentLng},${tencentLat}`;
-              this.setState({ latitudeAndLongitude });
+              this.setState({ latitudeAndLongitude, tencentLat, tencentLng });
               return getArea({ latitudeAndLongitude, token });
             })
             .then(res => {
@@ -151,12 +153,18 @@ export default class O2oIndex extends Component {
     let token = wxUserInfo.token
     this.getattentionInfo(token);
   }
+
   // 获取会员中心信息
   getattentionInfo = (token) => {
     attentionInfo({ token })
       .then(data => {
+        let activityList = data.activityList;
+        let order = { activityId: '', name: '订购', logoUrl: '' };
+        let prize = { activityId: '', name: '奖品', logoUrl: '' };
+        activityList.push(order, prize)
         this.setState({
           attentionInfo: data,
+          activityList,
           bindphoneNumberIntegral: data.bindPhoneNumber,
           menberCenterIntegral: data.integral
         })
@@ -185,23 +193,54 @@ export default class O2oIndex extends Component {
     let pathParams = getReactRouterParams('/frontEnd/o2oDetail', parmas);
     this.props.history.push(pathParams);
   }
-  goTurntable = () => {
+  goTurntable = (item) => {
     let wxUserInfo = getCacheWxUserInfo();
     if (!wxUserInfo || !wxUserInfo.token) {
       return;
     }
     let token = wxUserInfo.token;
-    eventPage({ token })
-      .then(data => {
-        if (data.activity == 1) {
-          setTurntablePageInitData(data);
-          let pathParams = getReactRouterParams('/frontEnd/turntable', { activityId: data.activityId });
-          this.props.history.push(pathParams);
-        } else {
-          Toast('活动暂未开启，敬请期待')
-          return;
-        }
-      })
+    if (item.activityId) {
+      let { tencentLat, tencentLng } = this.state;
+      let latLng = `${tencentLng},${tencentLat}`;
+      let activityId = item.activityId
+      eventPage({ token, latLng, activityId })
+        .then(data => {
+          if (data.activity == 1) {
+            let prizes = this.formatList(data.prizes);
+            let pageInitData = data;
+            pageInitData.prizes = prizes;
+            let pathParams
+            setTurntablePageInitData(pageInitData);
+            if (data.style == 1) {
+              pathParams = getReactRouterParams('/frontEnd/turntable1', { activityId: data.activityId });
+            } else if (data.style == 2) {
+              pathParams = getReactRouterParams('/frontEnd/turntable2', { activityId: data.activityId });
+            }
+
+            this.props.history.push(pathParams);
+          } else {
+            Toast('活动暂未开启，敬请期待')
+            return;
+          }
+        })
+    }
+    if (item.name == '订购') {
+      this.goOrder()
+    }
+    if (item.name == '奖品') {
+      this.goPrize()
+    }
+  }
+  // 格式化
+  formatList = (list) => {
+    if (!list || !list.length) {
+      return list;
+    }
+    list.forEach((order => {
+      order.color = '#' + order.color;
+
+    }))
+    return list;
   }
   //  点击详情
   clickGetDetail = () => {
@@ -230,7 +269,7 @@ export default class O2oIndex extends Component {
                                 return (
                                   <div className='list_item' key={index} onClick={() => this.goDetail(item)}>
                                     <div style={{ height: '150px', background: 'red', borderRadius: '5px 5px 0 0' }}>
-                                      <img src={item.image} style={{ width: '100%', height: '100%', objectFit: 'cover',borderRadius: '5px 5px 0 0' }} alt='' />
+                                      <img src={item.image} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '5px 5px 0 0' }} alt='' />
                                     </div>
                                     <div style={{ padding: '10px' }}>
                                       <div>{item.name}</div>
@@ -276,6 +315,7 @@ export default class O2oIndex extends Component {
               <MemberCenterComponent
                 isShowMemberCenter={this.state.isShowMemberCenter}
                 attentionInfo={this.state.attentionInfo}
+                activityList={this.state.activityList}
                 bindphoneNumberIntegral={this.state.bindphoneNumberIntegral}
                 _integralbindPhone={this._integralbindPhone}
                 menberCenterIntegral={this.state.menberCenterIntegral}
