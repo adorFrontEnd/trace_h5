@@ -113,11 +113,11 @@ class Page extends Component {
   clickComfirm = () => {
     this.setState({ isShowVerifyBox: false }, () => {
       let wxUserInfo = getCacheWxUserInfo();
-      // if (!wxUserInfo || !wxUserInfo.token) {
-      //   return;
-      // }
-      // let token = wxUserInfo.token;
-      let token='kcuFhL8NStlOPtyCmEAQKRGHJ7gHWjCZX0gG1zYSCuT2lOxwfisRTANkDYsTymvw'
+      if (!wxUserInfo || !wxUserInfo.token) {
+        return;
+      }
+      let token = wxUserInfo.token;
+      // let token='kcuFhL8NStlOPtyCmEAQKRGHJ7gHWjCZX0gG1zYSCuT2lOxwfisRTANkDYsTymvw'
       let { phone, imgeCode } = this.state;
       sendMessages({ phone, token, code: imgeCode })
         .then((data) => {

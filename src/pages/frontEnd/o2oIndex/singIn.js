@@ -79,9 +79,10 @@ class Page extends Component {
               :
               <div className='comfirmSingIn' onClick={this.clickComfirmSinIn}>{this.state.buttonMessage}</div>
           }
-          <div style={{marginBottom:'10px'}}>
-          <span dangerouslySetInnerHTML={{ __html: this.state.singInList&&this.state.singInList.remark }}></span>
-            </div>
+          <div style={{ marginBottom: '10px' }}>
+            <div>签到说明：</div>
+            <span dangerouslySetInnerHTML={{ __html: this.state.singInList && this.state.singInList.remark }}></span>
+          </div>
           {
             this.state.o2oList && this.state.o2oList.length ?
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', }}>

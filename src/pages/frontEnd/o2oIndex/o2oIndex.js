@@ -3,7 +3,7 @@ import './index.less';
 import ActivityPage from '../../../components/common-page/ActivityPage';
 import { wxLogin, getWxAuthRedirectUri } from '../../../api/wx/auth';
 import wx from 'weixin-js-sdk';
-import Toast from '../../../utils/toast';
+import Toast, { T } from 'react-toast-mobile';
 import { wxConfigInit, getUserLocation } from '../../../api/wx/wxConfig';
 import { getWxConfig } from '../../../api/wx/common';
 import { parseUrl, getReactRouterParams } from '../../../utils/urlUtils';
@@ -11,9 +11,10 @@ import { getArea, eventPage } from '../../../api/frontEnd/o2oIndex';
 import { setCacheWxUserInfo, getCacheWxUserInfo } from '../../../middleware/localStorage/wxUser';
 import { setTurntablePageInitData } from '../../../middleware/localStorage/o2oIndex';
 import { attentionInfo } from '../../../api/frontEnd/menberCenter';
+import { getCity } from '../../../api/frontEnd/trace';
 import MemberCenterComponent from '../antiFake/MemberCenterComponent';
 import BottomComponent from '../antiFake/BottomComponent';
-const _title = "智慧防伪";
+const _title = "o2o";
 const _description = "";
 export default class O2oIndex extends Component {
   state = {
@@ -27,7 +28,9 @@ export default class O2oIndex extends Component {
     bindphoneNumberIntegral: null,
     menberCenterIntegral: null,
     tencentLng: null,
-    tencentLat: null
+    tencentLat: null,
+    cityId: null,
+    isshowTips: false
     // token: 'kcuFhL8NStlOPtyCmEAQKRGHJ7gHWjCZX0gG1zYSCuT5yY31pomDZYIpgC5RVnst'
   }
   componentDidMount() {
@@ -48,7 +51,7 @@ export default class O2oIndex extends Component {
     getWxConfig({ url, frnId })
       .then((res) => {
         let { appId } = res;
-        let uri = getWxAuthRedirectUri(`http://test.h5.trace.adorsmart.com/frontEnd/o2oIndex`, 'user', frnId, appId);
+        let uri = getWxAuthRedirectUri(`http://h5.trace.adorsmart.com/frontEnd/o2oIndex`, 'user', frnId, appId);
         window.location.href = uri;
       })
   }
@@ -56,25 +59,44 @@ export default class O2oIndex extends Component {
     let frnId = urlParams.args.state;
     wxLogin({ code, frnId })
       .then(data => {
-        setCacheWxUserInfo(data);
-        let token = data.token
-        this.setState({ isShow: true })
-        this.pageWxInit({ frnId, token })
-          .then(data => {
-            let { latitude, longitude } = data;
-            let tencentLng = longitude;
-            let tencentLat = latitude;
-            let latitudeAndLongitude = `${tencentLng},${tencentLat}`;
-            this.setState({ latitudeAndLongitude, tencentLng, tencentLat });
-            return getArea({ latitudeAndLongitude, token });
-          })
-          .then(res => {
-            if (res && res.length == 0) {
-              this.setState({ isgoO2o: false })
-            } else {
-              this.setState({ isgoO2o: true, o2oList: res })
-            }
-          });
+        // alert(data)
+        if (data && data.subscribe == 1) {
+          setCacheWxUserInfo(data);
+          let token = data.token
+          // alert(JSON.stringify(data))
+          this.setState({ isShow: true })
+          this.pageWxInit({ frnId, token })
+            .then(data => {
+              let { latitude, longitude } = data;
+              let tencentLng = longitude;
+              let tencentLat = latitude;
+              let latitudeAndLongitude = `${tencentLng},${tencentLat}`;
+              getCity({ latitudeAndLongitude })
+                .then(res => {
+                  this.setState({ cityId: res.cityId });
+                })
+              this.setState({ latitudeAndLongitude, tencentLng, tencentLat });
+              return getArea({ latitudeAndLongitude, token });
+            })
+            .then(res => {
+              if (res && res.length == 0) {
+                this.setState({ isgoO2o: false })
+              } else {
+                this.setState({ isgoO2o: true, o2oList: res })
+              }
+            });
+        } else {
+          //未关注提示用户去关注微信公众号
+          let qrCode = data.qrCode;
+          let userSubscribeUrl = `http://h5.trace.adorsmart.com/frontEnd/userSubscribe?qrCode=${qrCode}&&frnId=${frnId}`
+          this.setState({ userSubscribeUrl,isshowTips:true })
+   
+
+          // T.alert({
+          //   title: '关注微信公众号',
+          //   message: '您暂未关注防伪公众号，关注公众号后才能查询哟~'
+          // });
+        }
 
       })
       .catch((data) => {
@@ -83,7 +105,7 @@ export default class O2oIndex extends Component {
           getWxConfig({ url, frnId })
             .then(data => {
               let { appId } = data;
-              let uri = getWxAuthRedirectUri(`http://test.h5.trace.adorsmart.com/frontEnd/o2oIndex`, 'user', null, appId);
+              let uri = getWxAuthRedirectUri(`http://h5.trace.adorsmart.com/frontEnd/o2oIndex`, 'user', null, appId);
               window.location.href = uri;
             })
         }
@@ -150,18 +172,20 @@ export default class O2oIndex extends Component {
       isShowMemberCenter: true
     })
     let wxUserInfo = getCacheWxUserInfo();
-    let token = wxUserInfo.token
-    this.getattentionInfo(token);
+    let token = wxUserInfo.token;
+    let { cityId } = this.state
+
+    this.getattentionInfo(token, cityId);
   }
 
   // 获取会员中心信息
-  getattentionInfo = (token) => {
-    attentionInfo({ token })
+  getattentionInfo = (token, cityId) => {
+    attentionInfo({ token, cityId })
       .then(data => {
         let activityList = data.activityList;
         let order = { activityId: '', name: '订购', logoUrl: '' };
         let prize = { activityId: '', name: '奖品', logoUrl: '' };
-        activityList.push(order, prize)
+        activityList.unshift(order, prize)
         this.setState({
           attentionInfo: data,
           activityList,
@@ -251,6 +275,17 @@ export default class O2oIndex extends Component {
   render() {
     return (
       <ActivityPage title={_title} description={_description} >
+        {
+          this.state.isshowTips ?
+            <div className='commodity_attr_box' onClick={this.hideVerifyCodeModal} style={{ height: "100vh", background: '#949494',padding:'0' }}>
+              {/* <div style={{ textAlign: 'right', padding: '10px' }}> <img src='/image/close.png' className='closeimg' onClick={this.clickVerifyCode} /></div> */}
+              <div className='content commodity_attr_box' style={{width:'60%',top:'35%',left:'20%',padding:'0',height:'140px'}}>
+                <div style={{ textAlign: "center", fontWeight: 'bold', marginTop: '10px' }}>关注微信公众号</div>
+                <div style={{ textAlign: "center", borderBottom: '1px solid #f2f2f2', padding: '10px' }}>您暂未关注微信公众号，关注后才能查询哟~</div>
+                <a href={this.state.userSubscribeUrl} style={{ textAlign: 'center', display: 'block', padding: '10px' }}>去关注</a>
+              </div></div> : null
+        }
+
 
         {
           this.state.isShow ?
@@ -261,7 +296,7 @@ export default class O2oIndex extends Component {
                     {
                       this.state.isgoO2o ?
 
-                        <div className='center'>
+                        <div style={{ marginBottom: '60px', padding: '10px', overflowY: 'scroll', height: '80vh' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', }}>
 
                             {

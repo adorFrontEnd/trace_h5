@@ -6,7 +6,7 @@ const _title = "微信授权";
 const _description = "";
 class Page extends Component {
   componentDidMount() {
-    let uri = getWxAuthRedirectUri('http://test.h5.trace.adorsmart.com/code/product');
+    let uri = getWxAuthRedirectUri('http://h5.trace.adorsmart.com/code/product');
     window.location.href = uri;
   }
 

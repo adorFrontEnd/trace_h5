@@ -40,7 +40,8 @@ class Page extends Component {
     if (!urlParams.args || !urlParams.args.frnId) {
       return;
     }
-    let { frnId } = urlParams.args;
+    let { frnId,uniqueCode } = urlParams.args;
+    
     this.setState({
       frnId
     }, () => {
@@ -162,11 +163,11 @@ class Page extends Component {
   }
 
   goTraceDetail = () => {
-    let parmas={};
-    let {traceDetail,frnId,status}=this.state;
-    parmas.traceDetail=traceDetail;
-    parmas.frnId=frnId;
-    parmas.status=status;
+    let parmas = {};
+    let { traceDetail, frnId, status } = this.state;
+    parmas.traceDetail = traceDetail;
+    parmas.frnId = frnId;
+    parmas.status = status;
     this.props.history.push({ pathname: '/frontEnd/traceDetail', state: { traceDetail: this.state.traceDetail, frnId: this.state.frnId, status: this.state.status } });
   }
 

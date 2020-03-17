@@ -8,6 +8,7 @@ import { isUserLogin } from '../middleware/localStorage/login';
 const TraceIndex = asyncComponent(() => import("../pages/frontEnd/trace/TraceIndex"));
 const UserAuth = asyncComponent(() => import("../pages/frontEnd/auth/UserAuth"));
 const UserSubscribe = asyncComponent(() => import("../pages/frontEnd/auth/UserSubscribe"));
+const Subscribe = asyncComponent(() => import("../pages/frontEnd/auth/subscribe"));
 const TraceDetail = asyncComponent(() => import("../pages/frontEnd/trace/TraceDetail"));
 const antiFakeDetail = asyncComponent(() => import("../pages/frontEnd/antiFake/antiFakeDetail"));
 const antiFakeIndex = asyncComponent(() => import("../pages/frontEnd/antiFake/antiFakeIndex"));
@@ -28,6 +29,7 @@ const PrizeInfo = asyncComponent(() => import("../pages/frontEnd/o2oIndex/prizeI
 // const Test = asyncComponent(() => import("../pages/frontEnd/o2oIndex/test"));
 const Turntable2 = asyncComponent(() => import("../pages/frontEnd/o2oIndex/turntable2"));
 const PcanPage = asyncComponent(() => import("../pages/scanPage/scanPage"));
+const VerificationCode = asyncComponent(() => import("../pages/verificationCode/verificationCode"));
 
 
 
@@ -51,6 +53,7 @@ export default class GlobalRouter extends React.Component {
           <Route exact={true} path='/code/product' component={antiFakeIndex} />
           <Route exact={true} path='/code/box' component={antiFakeIndex} />
           <Route exact={true} path='/frontEnd/userSubscribe' component={UserSubscribe} />
+          <Route exact={true} path='/frontEnd/subscribe' component={Subscribe} />
           <Route exact={true} path='/frontEnd/antiFake' component={antiFakeDetail} />
           <Route exact={true} path='/frontEnd/delerDetail' component={DelerDetail} />
           <Route exact={true} path='/frontEnd/lottery' component={Lottery} />
@@ -67,6 +70,7 @@ export default class GlobalRouter extends React.Component {
           <Route exact={true} path='/frontEnd/inquireResult' component={InquireResult} />
           <Route exact={true} path='/frontEnd/commomScan' component={CommomScan} />
           <Route exact={true} path='/frontEnd/singIn' component={SingIn} />
+          <Route exact={true} path='/frontEnd/verificationCode' component={VerificationCode} />
         
           <Route exact={true} path='/openApi/ADAuth' component={ADAuth} />
           <Route exact={true} path='/openApi/ADAuthLogin' component={ADAuthLogin} />

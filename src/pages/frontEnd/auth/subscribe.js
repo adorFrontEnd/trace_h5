@@ -25,44 +25,19 @@ class Page extends Component {
       return;
     }
     let { qrCode, frnId } = urlParams.args;
-    // this.getSecurityDecoration(frnId)
-    let backgroundImage = window.localStorage.getItem('backgroundImage');
-    let backgroundColor = window.localStorage.getItem('backgroundColor');
-    this.setState({ imgurl: qrCode, frnId, backgroundImage, backgroundColor })
-    let _isWxUserLogin = isWxUserLogin();
-    if (!_isWxUserLogin) {
-      return;
-    }
-    let uri = 'http://h5.trace.adorsmart.com/code/product';
-    window.location.href = uri;
+
+    this.setState({ imgurl: qrCode, frnId })
+
   }
 
-  getSecurityDecoration = (frnId) => {
-    // let { frnId } = this.state
-    securityDecoration({
-      frnId
-    }).then((res) => {
-      if (res) {
-        if (res.background) {
-          let backgroundImage = JSON.parse(res.background).image;
-          let backgroundColor = "#" + JSON.parse(res.background).color;
-          this.setState({
-            backgroundImage,
-            backgroundColor
-          })
-        }
-
-      }
-
-    })
-  }
+ 
   /**渲染**********************************************************************************************************************************/
 
   render() {
-    const { backgroundImage, backgroundColor } = this.state;
+
     return (
       <ActivityPage title={_title} description={_description}>
-        <div style={{ backgroundImage: `url(${backgroundImage})`, minHeight: '100vh', padding: '50px 30px 0 30px', background: backgroundColor, backgroundSize: '100%', position: 'relative' }}>
+        <div style={{  minHeight: '100vh', padding: '50px 30px 0 30px', backgroundSize: '100%', position: 'relative' }}>
           <img style={{ position: 'absolute', top: '219px', width: '150px', height: '150px', left: '31%' }} src={this.state.imgurl} />
           <div style={{ position: 'absolute', top: '185px', left: '30%' }}>长按下方<span style={{ color: '#1890FF' }}>二维码</span>关注我们</div>
         </div>

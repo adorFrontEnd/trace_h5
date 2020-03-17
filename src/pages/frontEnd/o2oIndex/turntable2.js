@@ -11,7 +11,16 @@ export default class demo extends Component {
         super(props);
         this.state = {
             // 九宫格内容list
-            list: [],
+            list: [
+                { id: "id", prizeLevel: "谢谢参与", prizeName: "谢谢参与", color: "#FFEF7B", orders: 4, prizeImage: 'http://images.669pic.com/element_pic/23/50/19/62/01984930591c480507111f2918aed000.jpg%21w700wb' },
+                { id: "id", prizeLevel: "谢谢参与", prizeName: "谢谢参与", color: "#FFEF7B", orders: 4, prizeImage: 'http://images.669pic.com/element_pic/23/50/19/62/01984930591c480507111f2918aed000.jpg%21w700wb' },
+                { id: "id", prizeLevel: "谢谢参与", prizeName: "谢谢参与", color: "#FFEF7B", orders: 4, prizeImage: 'http://images.669pic.com/element_pic/23/50/19/62/01984930591c480507111f2918aed000.jpg%21w700wb' },
+                { id: "id", prizeLevel: "谢谢参与", prizeName: "谢谢参与", color: "#FFEF7B", orders: 4, prizeImage: 'http://images.669pic.com/element_pic/23/50/19/62/01984930591c480507111f2918aed000.jpg%21w700wb' },
+                { id: "id", prizeLevel: "谢谢参与", prizeName: "谢谢参与", color: "#FFEF7B", orders: 4, prizeImage: 'http://images.669pic.com/element_pic/23/50/19/62/01984930591c480507111f2918aed000.jpg%21w700wb' },
+                { id: "id", prizeLevel: "谢谢参与", prizeName: "谢谢参与", color: "#FFEF7B", orders: 4, prizeImage: 'http://images.669pic.com/element_pic/23/50/19/62/01984930591c480507111f2918aed000.jpg%21w700wb' },
+                { id: "id", prizeLevel: "谢谢参与", prizeName: "谢谢参与", color: "#FFEF7B", orders: 4, prizeImage: 'http://images.669pic.com/element_pic/23/50/19/62/01984930591c480507111f2918aed000.jpg%21w700wb' },
+                { id: "id", prizeLevel: "谢谢参与", prizeName: "谢谢参与", color: "#FFEF7B", orders: 4, prizeImage: 'http://images.669pic.com/element_pic/23/50/19/62/01984930591c480507111f2918aed000.jpg%21w700wb' }
+            ],
             // 被选中的格子的ID
             activedId: '',
             // 中奖ID
@@ -31,7 +40,8 @@ export default class demo extends Component {
             status: null,
             isShowPrize: false,
             o2oList: null,
-            isShow: false
+            isShow: false,
+            pageInitData: null
         }
     }
     componentWillMount() {
@@ -49,22 +59,16 @@ export default class demo extends Component {
         let pageInitData = getTurntablePageInitData();
         let result = window.localStorage.getItem('o2oList');
         let o2oList = JSON.parse(result).slice(0, 4);
-        let list = pageInitData.prizes;
-        let arr = []
-        if (list && list.length < 8) {
-            for (let i = 0; i < list.length; i++) {
-                
-                let a = { id: "id", prizeLevel: "谢谢参与", prizeName: "谢谢参与", color: "#FFEF7B", orders: 4,prizeImage:'http://images.669pic.com/element_pic/23/50/19/62/01984930591c480507111f2918aed000.jpg%21w700wb' }
-                arr.push(list[i])
-                arr.push(a);
-            }
-        }
+        let prizeList = pageInitData.prizes;
+        prizeList = prizeList.filter(item => item.id != 'id');
+        let { list} = this.state;
+        let res = this._formatInitData(prizeList, list);
         this.setState({
-            list: this._formatList(arr),
+            list: this._formatList(res),
             integral: pageInitData.integral,
             token,
             restrict: pageInitData.restrict,
-            activityId, o2oList
+            activityId, o2oList, pageInitData
         })
     }
     // 格式化时间
@@ -76,6 +80,41 @@ export default class demo extends Component {
             item.prizeIndex = index;
         })
         return list;
+    }
+    // 处理转盘数据
+    _formatInitData = (data, list) => {
+        let len = data.length
+        data.map((item, index) => {
+            if (len == 1) {
+                list.splice(0, 1, data[0])
+            } else if (len == 2) {
+                list.splice(0, 1, data[0])
+                list.splice(2, 1, data[1])
+            } else if (len == 3) {
+                list.splice(0, 1, data[0])
+                list.splice(2, 1, data[1])
+                list.splice(4, 1, data[2])
+            } else if (len == 4) {
+                list.splice(0, 1, data[0])
+                list.splice(2, 1, data[1])
+                list.splice(4, 1, data[2])
+                list.splice(6, 1, data[3])
+            } else if (len == 5) {
+                list.splice(0, 1, data[0])
+                list.splice(2, 1, data[1])
+                list.splice(4, 1, data[2])
+                list.splice(6, 1, data[3])
+                list.splice(7, 1, data[4])
+            } else if (len == 6) {
+                list.splice(0, 1, data[0])
+                list.splice(2, 1, data[1])
+                list.splice(4, 1, data[2])
+                list.splice(6, 1, data[3])
+                list.splice(7, 1, data[4])
+                list.splice(1, 1, data[5])
+            }
+        })
+        return list
     }
     handleBegin() {
 
@@ -90,7 +129,7 @@ export default class demo extends Component {
                 isRolling: true
             }, () => {
                 // 状态还原之后才能开始真正的抽奖
-                this.handlePlay()
+            this.handlePlay()
             })
         }
     }
@@ -127,18 +166,18 @@ export default class demo extends Component {
 
         lottery({ token, activityId, latLng })
             .then(data => {
-             if(data.status==4){
-                Toast('积分不足，无法参与抽奖');
-                this.setState({
-                    activedId: '',
-                    prizeIdIndex: null,
-                    times: 0,
-                    actTimes: 0,
-                    isRolling: false,
-                    isShowPrize: false
-                })
-                return;
-             }
+                if (data.status == 4) {
+                    Toast('积分不足，无法参与抽奖');
+                    this.setState({
+                        activedId: '',
+                        prizeIdIndex: null,
+                        times: 0,
+                        actTimes: 0,
+                        isRolling: false,
+                        isShowPrize: false
+                    })
+                    return;
+                }
                 lotteryDetail = data.data;
                 this.startLottry(list, lotteryDetail);
                 this.setState({
@@ -153,6 +192,7 @@ export default class demo extends Component {
                 lotteryDetail.integral = integral;
                 lotteryDetail.restrict = restrict;
                 this.startLottry(list, lotteryDetail);
+                this.setState({status:2})
             })
     }
 
@@ -253,7 +293,7 @@ export default class demo extends Component {
         this.props.history.push(pathParams);
     }
     render() {
-        const { list, activedId, prizeIdIndex } = this.state;
+        const { list, activedId, prizeIdIndex, pageInitData } = this.state;
         return (
             <div style={{ background: '#ff4444', minHeight: '100vh', backgroundImage: `url('https://img.yzcdn.cn/public_files/2019/11/06/6ced8d17e8acc56d09464a17b85105c8.png')`, backgroundSize: '100% auto', backgroundRepeat: 'no-repeat' }}>
                 <div style={{ padding: '10px' }}>
@@ -279,7 +319,10 @@ export default class demo extends Component {
                             <div className='c-btn__chance'>剩余{this.state.restrict}次机会</div>
                         </div>
                     </div>
-                    <div style={{ margin: '0 0 10px 10px', color: '#fff', fontSize: '16px' }}>我的积分:{this.state.integral}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#fff', fontSize: '16px', margin: '0 0 10px 10px' }}>
+                        <div>我的积分:{this.state.integral}</div>
+                        <div>每次抽奖消耗{this.state.pageInitData && this.state.pageInitData.consumptionPoints}积分</div>
+                    </div>
                     {
                         this.state.o2oList && this.state.o2oList.length ?
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', padding: '10px' }}>

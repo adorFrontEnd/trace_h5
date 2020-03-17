@@ -265,7 +265,11 @@ const scanQRCode = () => {
             },
             fail: (err) => {
                 reject(err);
-            }
+            },
+            complete:(err)=> {
+                reject(err);
+                // wx.hideNavigationBarLoading();
+              }
 
         });
     })

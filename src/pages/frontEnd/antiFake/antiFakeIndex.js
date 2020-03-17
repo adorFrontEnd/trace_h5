@@ -85,7 +85,6 @@ class Page extends Component {
         let tencentLat = latitude;
         this.firstAuthorized({ frnId, urlParams, tencentLng, tencentLat });
       })
-
   }
 
   // 第一次进入页面判断用户是否应该关注公众号
@@ -135,7 +134,7 @@ class Page extends Component {
   // 授权
   goWxAuth = (appId, uniqueCode) => {
     this.setState({ appId })
-    let uri = getWxAuthRedirectUri(`http://test.h5.trace.adorsmart.com/code/product`, 'user', uniqueCode, appId);
+    let uri = getWxAuthRedirectUri(`http://h5.trace.adorsmart.com/code/product`, 'user', uniqueCode, appId);
     window.location.href = uri;
   }
   /****第二次进入页面******************************************************************************************************************* */
@@ -176,7 +175,6 @@ class Page extends Component {
         if (data && data.subscribe == 1) {
           // 用户已经关注，判断是否开启防伪验证
           if (latitudeAndLongitude == 'undefined,undefined') {
-            // this.getUserIp(uniqueCode, frnId, cityId,token)
             this.getSecurityCheck(null, uniqueCode, frnId, cityId);
             return
           } else {
@@ -191,7 +189,7 @@ class Page extends Component {
             title: '关注微信公众号',
             message: '您暂未关注防伪公众号，关注公众号后才能查询哟~',
             text: '去关注',
-            fn: () => window.location.href = `http://test.h5.trace.adorsmart.com/frontEnd/userSubscribe?qrCode=${qrCode}&&frnId=${frnId}`
+            fn: () => window.location.href = `http://h5.trace.adorsmart.com/frontEnd/userSubscribe?qrCode=${qrCode}&&frnId=${frnId}`
           });
         }
       })
@@ -202,7 +200,7 @@ class Page extends Component {
             .then(data => {
               let { appId } = data;
               this.setState({ appId })
-              let uri = getWxAuthRedirectUri(`http://test.h5.trace.adorsmart.com/code/product`, 'user', uniqueCode, appId);
+              let uri = getWxAuthRedirectUri(`http://h5.trace.adorsmart.com/code/product`, 'user', uniqueCode, appId);
               window.location.href = uri;
             })
         }
@@ -235,7 +233,6 @@ class Page extends Component {
               let { latitude, longitude } = data;
               let tencentLng = longitude;
               let tencentLat = latitude;
-              console.log(tencentLng, tencentLat)
               window.localStorage.setItem('tencentLng', tencentLng);
               window.localStorage.setItem('tencentLat', tencentLat);
             }
@@ -252,7 +249,6 @@ class Page extends Component {
 
   // 获取区域
   getarea = (latitudeAndLongitude, uniqueCode, frnId, cityId, token) => {
-    console.log(token)
     getArea({ latitudeAndLongitude, token })
       .then(res => {
         if (res.length == 0) {

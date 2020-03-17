@@ -9,8 +9,8 @@ export default class demoItem extends Component {
   render() {
     const { content, activedId} = this.props;
     return (
-      <div className={activedId ===content.prizeIndex? 'c-award__container row_item-active' : ' c-award__container '}>
-        <img src={content.prizeImage} className='c-award__icon' />
+      <div className={activedId === content.prizeIndex? 'c-award__container row_item-active' : ' c-award__container '}>
+        <img src={content.prizeImage?content.prizeImage:null} className='c-award__icon' />
         
         <p className='l-general__desc c-award__desc'>{content.prizeName?content.prizeName:content.prizeLevel}</p>
 

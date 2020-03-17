@@ -5,9 +5,9 @@ let openApiDomain = '';
 //俊宝
 // domain = "http://192.168.20.54:9300";
 // 正式
-// domain = "https://gw.adorsmart.com/trace";
+domain = "https://gw.adorsmart.com/trace";
 // 测试服务
-domain = 'https://s.adorsmart.com/tta';
+// domain = 'https://s.adorsmart.com/tta';
 
 /**openApi *****************************************************/
 // 博文

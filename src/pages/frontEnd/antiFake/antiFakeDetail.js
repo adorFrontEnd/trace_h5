@@ -125,7 +125,6 @@ class Page extends Component {
   tabOrder = (e) => {
     let activeType = e.currentTarget.dataset.type;
     this.setState({ activeType });
-
   }
 
   /***页面初始化************************************************************************************************** */
@@ -137,7 +136,6 @@ class Page extends Component {
       return;
     }
     let { frnId, uniqueCode, isStartActive, cityId, isgoO2o } = urlParams.args;
-    // let { frnId, uniqueCode, isStartActive, cityId, isgoO2o } = this.state;
     // 获取缓存数据
     let isPhone = window.localStorage.getItem('isPhone');
     let res = window.localStorage.getItem('traceDetail');
@@ -257,14 +255,14 @@ class Page extends Component {
                 isIntegralBind: true,
                 inShowBindPhone: false
               })
-              this.getIncreasePoints(writeOffLogId, token)
+              this.getIncreasePoints(writeOffLogId, token);
             }
           } else {
             this.setState({
               isIntegralBind: true,
               inShowBindPhone: false
             })
-            this.getIncreasePoints(writeOffLogId, token)
+            this.getIncreasePoints(writeOffLogId, token);
           }
         }
       })
@@ -397,17 +395,18 @@ class Page extends Component {
       isShowMemberCenter: true,
       inShowBindPhone: false
     })
-    let { token } = this.state;
-    this.getattentionInfo(token);
+    let { token,cityId } = this.state;
+ 
+    this.getattentionInfo(token,cityId);
   }
   // 获取会员中心信息
-  getattentionInfo = (token) => {
-    attentionInfo({ token })
+  getattentionInfo = (token,cityId) => {
+    attentionInfo({ token,cityId })
       .then(data => {
         let activityList = data.activityList;
         let order = { activityId: '', name: '订购', logoUrl: '' };
         let prize = { activityId: '', name: '奖品', logoUrl: '' };
-        activityList.push(order, prize)
+        activityList.unshift(order, prize)
         this.setState({
           attentionInfo: data,
           activityList,
@@ -792,11 +791,7 @@ class Page extends Component {
       <ActivityPage title={_title} description={_description} >
         <div style={{ background: backgroundColor, backgroundImage: `url(${backgroundImage + "?x-oss-process=image/resize,l_800"})`, minHeight: '100vh', backgroundSize: '100%', position: 'relative' }}>
           {/* ****************************防伪查询********************************* */}
-          {/* {this.state.whetherToOpen !== 1 && this.state.isShowAntiFake ?
-            <div className='checksingIn' onClick={this.clickSingIn}>
-              签到
-              </div> : null
-          } */}
+         
           {
             this.state.isShowAntiFake ?
               <div>
@@ -817,7 +812,7 @@ class Page extends Component {
 
                       </div>
 
-                      <div className='center'>
+                      <div style={{marginBottom:'60px',padding:'10px',overflowY:'scroll',height:'80vh'}}>
                         {this.state.whetherToOpen == 1 ?
                           <div className='checksingIn' onClick={this.clickSingIn}>签到</div> : null
                         }

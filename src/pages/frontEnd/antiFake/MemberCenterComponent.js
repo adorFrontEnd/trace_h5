@@ -36,13 +36,9 @@ export default class Page extends Component {
                 <div >{this.props.menberCenterIntegral}</div>
               </div>
             </div>
-            <div className='itemList' style={{ width: '100%', padding: '0' }} >
-              {/* <div className='item' onClick={this.props.goOrder}>
-                <img src='/image/order.png' style={{ height: '35px', width: '35px', marginBottom: '20px' }} alt=''></img>
-                <div>订购</div>
-              </div> */}
+            <div className='itemList' style={{ width: '100%', padding: '0',overflowY:'scroll',height:'59vh' }} >
 
-              <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap',width:'100%' }}>
 
                 {
                   this.props.activityList && this.props.activityList.map((item, index) => {
@@ -70,10 +66,6 @@ export default class Page extends Component {
                 }
 
               </div>
-              {/* <div className='item' onClick={this.props.goPrize}>
-                <img src='/image/prize.png' style={{ height: '35px', width: '35px', marginBottom: '20px' }} alt=''></img>
-                <div>奖品</div>
-              </div> */}
             </div>
 
           </div>
