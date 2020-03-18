@@ -158,7 +158,7 @@ export default class MemberCenter extends Component {
           </div>
 
 
-          <div style={{ maxHeight: '84vh', overflowY: 'auto' }}>
+          <div style={{ maxHeight: '100vh', overflowY: 'auto' }}>
             {
               orderList && orderList.map((item, index) => {
                 return (
@@ -215,8 +215,9 @@ export default class MemberCenter extends Component {
                 )
               })
             }
+             <div style={{ textAlign: 'center', padding: '10px' }} onClick={() => this.lodingMore(activeType)}>{isLoadingMore}</div>
           </div>
-          <div style={{ textAlign: 'center', padding: '10px' }} onClick={() => this.lodingMore(activeType)}>{isLoadingMore}</div>
+         
           {
             this.state.isShowqrCode ?
               <div className='box'>

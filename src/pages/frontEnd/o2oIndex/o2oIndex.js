@@ -14,7 +14,7 @@ import { attentionInfo } from '../../../api/frontEnd/menberCenter';
 import { getCity } from '../../../api/frontEnd/trace';
 import MemberCenterComponent from '../antiFake/MemberCenterComponent';
 import BottomComponent from '../antiFake/BottomComponent';
-const _title = "o2o";
+const _title = "友淘邦O2O";
 const _description = "";
 export default class O2oIndex extends Component {
   state = {
@@ -206,10 +206,6 @@ export default class O2oIndex extends Component {
     let wxUserInfo = getCacheWxUserInfo();
     let token = wxUserInfo.token;
     let { cityId } = this.state
-    if (!cityId) {
-      alert('获取地理位置失败')
-      return
-    }
     this.getattentionInfo(token, cityId);
   }
 
