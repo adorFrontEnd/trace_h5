@@ -24,7 +24,7 @@ const wxConfigInit = (url, frnId, callback) => {
                 nonceStr, // 必填，生成签名的随机串
                 signature,// 必填，签名，见附录1
                 jsApiList: [
-                    'onMenuShareAppMessage',
+                    'hideMenuItems',
                     "scanQRCode",
                     "getLocation",
                     "openLocation"

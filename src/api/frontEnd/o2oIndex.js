@@ -24,6 +24,7 @@ const couponQRCode = (params) => {
     return result.url;
   }
 }
+
 // 获取订购列表
 const subscriptionList = (params) => {
   return baseHttpProvider.getApi('api/v1.0/newSecurity/subscriptionList', params, { total: true });

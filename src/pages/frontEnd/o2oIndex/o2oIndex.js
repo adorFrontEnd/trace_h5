@@ -67,9 +67,17 @@ export default class O2oIndex extends Component {
           this.setState({ isShow: true })
           this.pageWxInit({ frnId, token })
             .then(data => {
+              if (data.errMsg == 'getLocation:fail') {
+                alert('获取地理位置失败');
+                return;
+              }
               let { latitude, longitude } = data;
               let tencentLng = longitude;
               let tencentLat = latitude;
+              if ((tencentLng == 'undefined' && tencentLat == 'undefined')) {
+                alert('未获取到地理位置')
+                return
+              }
               let latitudeAndLongitude = `${tencentLng},${tencentLat}`;
               getCity({ latitudeAndLongitude })
                 .then(res => {
@@ -77,6 +85,7 @@ export default class O2oIndex extends Component {
                 })
               this.setState({ latitudeAndLongitude, tencentLng, tencentLat });
               return getArea({ latitudeAndLongitude, token });
+
             })
             .then(res => {
               if (res && res.length == 0) {
@@ -89,13 +98,7 @@ export default class O2oIndex extends Component {
           //未关注提示用户去关注微信公众号
           let qrCode = data.qrCode;
           let userSubscribeUrl = `http://h5.trace.adorsmart.com/frontEnd/userSubscribe?qrCode=${qrCode}&&frnId=${frnId}`
-          this.setState({ userSubscribeUrl,isshowTips:true })
-   
-
-          // T.alert({
-          //   title: '关注微信公众号',
-          //   message: '您暂未关注防伪公众号，关注公众号后才能查询哟~'
-          // });
+          this.setState({ userSubscribeUrl, isshowTips: true })
         }
 
       })
@@ -115,9 +118,17 @@ export default class O2oIndex extends Component {
           let token = wxUserInfo.token
           this.pageWxInit({ frnId, token })
             .then(data => {
+              if (data.errMsg == 'getLocation:fail') {
+                alert('获取地理位置失败');
+                return;
+              }
               let { latitude, longitude } = data;
               let tencentLng = longitude;
               let tencentLat = latitude;
+              if ((tencentLng == 'undefined' && tencentLat == 'undefined')) {
+                alert('未获取到地理位置')
+                return
+              }
               let latitudeAndLongitude = `${tencentLng},${tencentLat}`;
               this.setState({ latitudeAndLongitude, tencentLat, tencentLng });
               return getArea({ latitudeAndLongitude, token });
@@ -140,17 +151,38 @@ export default class O2oIndex extends Component {
       // 注册jsdk
       wxConfigInit(null, frnId, null);
       wx.ready(() => {
+        wx.hideMenuItems({
+          menuList: [
+            'menuItem:share:appMessage',
+            "menuItem:share:timeline",
+            "menuItem:copyUrl",
+            "menuItem:editTag",
+            "menuItem:delete",
+            "menuItem:originPage",
+            "menuItem:readMode",
+            "menuItem:openWithQQBrowser",
+            "menuItem:openWithSafari",
+            "menuItem:share:email",
+            "menuItem:share:brand",
+            "menuItem:share:qq",
+            "menuItem:share:QZone",
+            "menuItem:favorite"
+          ]
+          // 要隐藏的菜单项，只能隐藏“传播类”和“保护类”按钮，所有menu项见附录3
+        });
         // 获取用户经纬度
         getUserLocation()
           .then((data) => {
             if (!data) {
-              Toast('获取地理位置失败');
+              alert('获取地理位置失败');
               return;
             }
+
             resolve(data)
           })
           .catch(() => {
-            Toast('获取地理位置失败');
+            alert('获取地理位置失败');
+            return
           })
       })
     })
@@ -174,7 +206,10 @@ export default class O2oIndex extends Component {
     let wxUserInfo = getCacheWxUserInfo();
     let token = wxUserInfo.token;
     let { cityId } = this.state
-
+    if (!cityId) {
+      alert('获取地理位置失败')
+      return
+    }
     this.getattentionInfo(token, cityId);
   }
 
@@ -240,7 +275,6 @@ export default class O2oIndex extends Component {
             } else if (data.style == 2) {
               pathParams = getReactRouterParams('/frontEnd/turntable2', { activityId: data.activityId });
             }
-
             this.props.history.push(pathParams);
           } else {
             Toast('活动暂未开启，敬请期待')
@@ -277,9 +311,9 @@ export default class O2oIndex extends Component {
       <ActivityPage title={_title} description={_description} >
         {
           this.state.isshowTips ?
-            <div className='commodity_attr_box' onClick={this.hideVerifyCodeModal} style={{ height: "100vh", background: '#949494',padding:'0' }}>
+            <div className='commodity_attr_box' onClick={this.hideVerifyCodeModal} style={{ height: "100vh", background: '#949494', padding: '0' }}>
               {/* <div style={{ textAlign: 'right', padding: '10px' }}> <img src='/image/close.png' className='closeimg' onClick={this.clickVerifyCode} /></div> */}
-              <div className='content commodity_attr_box' style={{width:'60%',top:'35%',left:'20%',padding:'0',height:'140px'}}>
+              <div className='content commodity_attr_box' style={{ width: '60%', top: '35%', left: '20%', padding: '0', height: '140px' }}>
                 <div style={{ textAlign: "center", fontWeight: 'bold', marginTop: '10px' }}>关注微信公众号</div>
                 <div style={{ textAlign: "center", borderBottom: '1px solid #f2f2f2', padding: '10px' }}>您暂未关注微信公众号，关注后才能查询哟~</div>
                 <a href={this.state.userSubscribeUrl} style={{ textAlign: 'center', display: 'block', padding: '10px' }}>去关注</a>
@@ -303,7 +337,7 @@ export default class O2oIndex extends Component {
                               this.state.o2oList && this.state.o2oList.map((item, index) => {
                                 return (
                                   <div className='list_item' key={index} onClick={() => this.goDetail(item)}>
-                                    <div style={{ height: '150px', background: 'red', borderRadius: '5px 5px 0 0' }}>
+                                    <div style={{ height: '150px', borderRadius: '5px 5px 0 0' }}>
                                       <img src={item.image} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '5px 5px 0 0' }} alt='' />
                                     </div>
                                     <div style={{ padding: '10px' }}>

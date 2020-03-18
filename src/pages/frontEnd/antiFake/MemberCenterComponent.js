@@ -36,7 +36,7 @@ export default class Page extends Component {
                 <div >{this.props.menberCenterIntegral}</div>
               </div>
             </div>
-            <div className='itemList' style={{ width: '100%', padding: '0',overflowY:'scroll',height:'59vh' }} >
+            <div className='itemList' style={{ width: '100%', padding: '0',overflowY:'scroll',minHeight:'120px',marginBottom:'20%' }} >
 
               <div style={{ display: 'flex', flexWrap: 'wrap',width:'100%' }}>
 

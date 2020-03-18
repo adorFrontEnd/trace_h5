@@ -4,6 +4,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import ActivityPage from '../../../components/common-page/ActivityPage';
 import wx from 'weixin-js-sdk';
 import Toast from '../../../utils/toast';
+import { wxConfigInit } from '../../../api/wx/wxConfig';
 import { parseUrl, joinParam } from '../../../utils/urlUtils';
 import { getCacheWxUserInfo } from '../../../middleware/localStorage/wxUser';
 import { eventGoodsDetail, createOrder, subscriptionListDetail, couponQRCode } from '../../../api/frontEnd/o2oIndex';
@@ -16,7 +17,7 @@ export default class MemberCenter extends Component {
     orderId: null,
     orderDetail: null,
     qrCode: null,
-    copied: false    
+    copied: false
   }
   componentDidMount() {
     let urlParams = parseUrl(this.props.location.search);
@@ -30,9 +31,8 @@ export default class MemberCenter extends Component {
     let token = wxUserInfo.token;
     this.getsubscriptionListDetail(orderId, token);
     this.getcouponQRCode(orderId, token);
-
-
   }
+
   // 获取详情
   getsubscriptionListDetail = (orderId, token) => {
     subscriptionListDetail({ orderId, token })
@@ -45,7 +45,26 @@ export default class MemberCenter extends Component {
     let qrCode = couponQRCode({ orderId, token });
     this.setState({ qrCode });
   }
-
+  
+  copyImg = () => {
+    let imgbox = document.getElementById('imgbox')
+    let canvas = this.convertImageToCanvas(imgbox)
+    let imgbox2 = document.getElementById('imgbox2')
+    let image = this.convertCanvasToImage(canvas)
+    imgbox2.appendChild(image)
+  }
+  convertImageToCanvas = (image) => {
+    var canvas = document.createElement("canvas");
+    canvas.width = 200;
+    canvas.height = 238;
+    canvas.getContext("2d").drawImage(image, 0, 0);
+    return canvas;
+  }
+  convertCanvasToImage = (canvas) => {
+    var image = new Image();
+    image.src = canvas.toDataURL("image/png");
+    return image;
+  }
   /**复制*************************************************************************************************************************/
   onCopiedClicked = () => {
     this.setState({ copied: true });
@@ -110,10 +129,10 @@ export default class MemberCenter extends Component {
           }
           {orderDetail && orderDetail.serviceStatus == 2 || orderDetail && orderDetail.serviceStatus == 3 || orderDetail && orderDetail.serviceStatus == 5 ?
             <div style={{ padding: '10px 0', borderBottom: '1px solid #f2f2f2' }}>
-              <div style={{ height: '250px', width: '250px', background: '#ccc', margin: '0px auto' }}>
-                <img src={this.state.qrCode} style={{ width: '100%', height: '100%' }} ref="qrCode" />
+              <div style={{ height: '238px', width: '200px', margin: '0px auto' }}>
+                <img src={this.state.qrCode} style={{ width: '100%', height: '100%' }} ref="qrCode" onload={this.copyImg} />
               </div>
-              <div>服务地址：</div>
+              <div style={{marginTop:'10px'}}>服务地址：</div>
               <div>{orderDetail && orderDetail.serviceAddress}</div>
               <div>{orderDetail && orderDetail.businessName} {orderDetail && orderDetail.businessPhone}</div>
             </div> : null
@@ -122,17 +141,15 @@ export default class MemberCenter extends Component {
             <div>订单信息</div>
             <div style={{ display: 'flex' }}>
               <div style={{ marginRight: '10px' }}>订单编号</div>
-              <div style={{ display: 'flex' }}>
+              <div >
                 <div>{orderDetail && orderDetail.orderNo}</div>
-              </div>
-            </div>
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <CopyToClipboard text={orderDetail && orderDetail.orderNo}
+                <CopyToClipboard text={orderDetail && orderDetail.orderNo}
                 onCopy={() => { this.onCopiedClicked() }}>
-                <div style={{ color: '#FF2B64', width: 50, textAlign: "center" }}>
-                  复制
+                <div style={{ color: '#FF2B64' }}>
+                  复制编号
               </div>
               </CopyToClipboard>
+              </div>
             </div>
             <div style={{ display: 'flex' }}>
               <div style={{ marginRight: '10px' }}>下单时间</div>

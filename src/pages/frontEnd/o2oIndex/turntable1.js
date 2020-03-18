@@ -220,7 +220,6 @@ class Page extends Component {
       this.state.canBeClick = true;
       if (this.state.status == 1) {
         this.setState({ isShowPrize: true });
-        console.log(this.state.type)
       }
       if (this.state.status == 2) {
         Toast('很遗憾,未抽中');
