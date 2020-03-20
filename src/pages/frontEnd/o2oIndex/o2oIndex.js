@@ -14,7 +14,7 @@ import { attentionInfo } from '../../../api/frontEnd/menberCenter';
 import { getCity } from '../../../api/frontEnd/trace';
 import MemberCenterComponent from '../antiFake/MemberCenterComponent';
 import BottomComponent from '../antiFake/BottomComponent';
-const _title = "友淘邦O2O";
+const _title = '池上育宝记';
 const _description = "";
 export default class O2oIndex extends Component {
   state = {

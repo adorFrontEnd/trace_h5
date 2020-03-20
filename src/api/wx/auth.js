@@ -4,9 +4,9 @@
 // import { appId, appSecret } from '../../config/app.config';
 import baseHttpProvider from '../base/baseHttpProvider';
 const wxLogin = (params) => {
-  return baseHttpProvider.getApi('authorize/concernedAbout', { ...params },{tokenless:true,toast: { required: false}})
+  return baseHttpProvider.getApi('authorize/concernedAbout', { ...params }, { tokenless: true, toast: { required: false } })
 }
-const getWxAuthRedirectUri = (url, scopeType, params,appId) => {
+const getWxAuthRedirectUri = (url, scopeType, params, appId) => {
   let scope = scopeType == "user" ? "snsapi_userinfo" : "snsapi_base";
   params = params || "STATE";
   url = encodeURIComponent(url);

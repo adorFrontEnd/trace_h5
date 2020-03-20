@@ -86,7 +86,7 @@ const _description = "";
   }
 
   valueOnchange = (value) => {
-    let receiptArea = value.join(',').replace(/,/g, '');
+    let receiptArea = value.join('-')
     this.setState({ receiptArea });
   }
 
