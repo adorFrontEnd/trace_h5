@@ -58,10 +58,10 @@ export default class demo extends Component {
         let { activityId } = urlParams.args;
         let pageInitData = getTurntablePageInitData();
         let result = window.localStorage.getItem('o2oList');
-        let o2oList = JSON.parse(result).slice(0, 4);
+        let o2oList = result ? JSON.parse(result).slice(0, 4) : [];
         let prizeList = pageInitData.prizes;
         prizeList = prizeList.filter(item => item.id != 'id');
-        let { list} = this.state;
+        let { list } = this.state;
         let res = this._formatInitData(prizeList, list);
         this.setState({
             list: this._formatList(res),
@@ -129,7 +129,7 @@ export default class demo extends Component {
                 isRolling: true
             }, () => {
                 // 状态还原之后才能开始真正的抽奖
-            this.handlePlay()
+                this.handlePlay()
             })
         }
     }
@@ -192,7 +192,7 @@ export default class demo extends Component {
                 lotteryDetail.integral = integral;
                 lotteryDetail.restrict = restrict;
                 this.startLottry(list, lotteryDetail);
-                this.setState({status:2})
+                this.setState({ status: 2 })
             })
     }
 
