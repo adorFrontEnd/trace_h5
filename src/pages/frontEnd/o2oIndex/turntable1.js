@@ -56,7 +56,7 @@ class Page extends Component {
     // 获取缓存初始化页面数据
     let pageInitData = getTurntablePageInitData();
     let result = window.localStorage.getItem('o2oList');
-    let o2oList = JSON.parse(result).slice(0, 4);
+    let o2oList = result ? JSON.parse(result).slice(0, 4) : [];
     this.getPrizeCarousel(activityId, token);
     let prizesList = pageInitData.prizes.filter(v => v.id != 'id');
     let awards = pageInitData.prizes
@@ -291,14 +291,14 @@ class Page extends Component {
     let pathParams = getReactRouterParams('/frontEnd/prizeInfo', { id: this.state.prizeId });
     this.props.history.push(pathParams);
   }
-    // 订购
-    goOrder = () => {
-      let params = {}
-      params.activeType = 0
-      let pathParams = getReactRouterParams('/frontEnd/order', params);
-      this.props.history.push(pathParams);
-    }
-    // 详情
+  // 订购
+  goOrder = () => {
+    let params = {}
+    params.activeType = 0
+    let pathParams = getReactRouterParams('/frontEnd/order', params);
+    this.props.history.push(pathParams);
+  }
+  // 详情
   goDetail = (item) => {
     let parmas = {};
     parmas.id = item.id
@@ -362,7 +362,7 @@ class Page extends Component {
           <div style={{ margin: '20px 0' }}>
             <span dangerouslySetInnerHTML={{ __html: this.state.pageInitData && this.state.pageInitData.description }}></span>
           </div>
-          {
+          {/* {
             this.state.o2oList && this.state.o2oList.length ?
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', }}>
 
@@ -371,7 +371,7 @@ class Page extends Component {
                     return (
                       <div className='list_item' key={index} onClick={() => this.goDetail(item)}>
                         <div style={{ height: '150px', background: 'red', borderRadius: '5px 5px 0 0' }}>
-                          <img src={item.image} style={{ width: '100%', height: '100%', objectFit: 'cover',borderRadius: '5px 5px 0 0' }} alt='' />
+                          <img src={item.image} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '5px 5px 0 0' }} alt='' />
                         </div>
                         <div style={{ padding: '10px' }}>
                           <div>{item.name}</div>
@@ -386,7 +386,7 @@ class Page extends Component {
                 }
 
               </div> : <div style={{ width: '100%', height: '60vh', background: '#ccc' }}>广告</div>
-          }
+          } */}
         </div>
         {
           this.state.isShowPrize ?

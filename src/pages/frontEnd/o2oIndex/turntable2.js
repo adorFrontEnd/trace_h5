@@ -323,7 +323,7 @@ export default class demo extends Component {
                         <div>我的积分:{this.state.integral}</div>
                         <div>每次抽奖消耗{this.state.pageInitData && this.state.pageInitData.consumptionPoints}积分</div>
                     </div>
-                    {
+                    {/* {
                         this.state.o2oList && this.state.o2oList.length ?
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', flexWrap: 'wrap', padding: '10px' }}>
 
@@ -347,7 +347,7 @@ export default class demo extends Component {
                                 }
 
                             </div> : <div style={{ width: '100%', height: '60vh', background: '#ccc' }}>广告</div>
-                    }
+                    } */}
 
                 </div>
                 {
