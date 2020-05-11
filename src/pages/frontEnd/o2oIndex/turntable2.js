@@ -83,8 +83,16 @@ export default class demo extends Component {
     }
     // 处理转盘数据
     _formatInitData = (data, list) => {
-        let len = data.length
-        data.map((item, index) => {
+        let len = data.length;
+        if (len >= 8) {
+            return data
+        }
+
+        if (len == 7) {
+            return [...data, list[0]];
+        }
+
+        data.forEach((item, index) => {
             if (len == 1) {
                 list.splice(0, 1, data[0])
             } else if (len == 2) {
